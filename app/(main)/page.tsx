@@ -23,11 +23,11 @@ export default function Home() {
       {/* loading screen */}
       <LoadingScreen />
       {/* page sections */}
-      <HomeSection />
-      <AboutSection />
+      {/* <HomeSection /> */}
+      {/* <AboutSection /> */}
       <ProjectsSection />
-      <Technologies />
-      <ContactSection />
+      {/* <Technologies /> */}
+      {/* <ContactSection /> */}
     </>
   );
 }

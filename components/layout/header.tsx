@@ -1,71 +1,70 @@
 'use client';
-import useHash from '@/hooks/use-hash';
 import { cn } from '@/lib/utils';
-import { File, Home, LucideSend, User } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '@/public/imgs/logo.webp';
-
-const navItems = [
-  {
-    id: 1,
-    name: 'Home.tsx',
-    path: '#home',
-    icon: Home,
-  },
-  {
-    id: 2,
-    name: 'About.tsx',
-    path: '#about',
-    icon: User,
-  },
-  {
-    id: 3,
-    name: 'Projects.tsx',
-    path: '#projects',
-    icon: File,
-  },
-  {
-    id: 4,
-    name: 'Contact-Me.tsx',
-    path: '#contact',
-    icon: LucideSend,
-    isRight: true,
-  },
-];
+import { useNavStore } from '@/store/use-nav-store';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
-  const { hash } = useHash();
+  const router = useRouter();
+  const { activeNavId, setActiveNavId, navItems, removeNavItem } = useNavStore();
 
+  const handleClose = (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (item.id === 1) {
+      return;
+    }
+    removeNavItem(item);
+    setActiveNavId(1);
+    router.replace('/');
+  };
   return (
     <div className='w-full h-12 border-b bg-muted flex items-center'>
       <div className='w-14 flex items-center justify-center flex-shrink-0 font-bold'>
-        <Image
-          src={logo}
-          alt='AK Logo'
-          width={24}
-          height={24}
-          className='object-contain'
-        />
+       SCAT 
       </div>
       <div className='flex items-center size-full'>
         {navItems.map((item) => {
-          const isActive =
-            item.path === hash || (item.path === '#home' && hash === '');
+          const isActive = item.id === activeNavId;
           return (
             <Link
               key={item.id}
               href={item.path}
               scroll
+              onClick={() => setActiveNavId(item.id)}
               className={cn(
                 'relative h-full w-fit md:min-w-40 border-x flex items-center justify-start gap-2 text-muted-foreground hover:bg-background px-4',
-                isActive && 'text-foreground bg-background hover:bg-background',
-                item.isRight && 'ml-auto'
+                isActive && 'text-foreground bg-background'
               )}
             >
-              <item.icon size={14} className='text-primary-foreground' />
-              <span className='hidden md:inline'>{item.name}</span>{' '}
-              {isActive && <BorderActive />}
+              <item.icon size={18} />
+              <span className='text-sm pr-3'>{item.name}</span>
+
+              {item.id !== 1 &&
+                <button
+                  onClick={(e) => handleClose(e, item)}
+                  className="absolute top-3 right-2 rounded-full hover:bg-red-100 transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-purple-300"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              }
             </Link>
           );
         })}
@@ -73,10 +72,3 @@ export default function Header() {
     </div>
   );
 }
-
-const BorderActive = () => (
-  <>
-    <div className='absolute top-0 left-0 w-full h-1 bg-gradient-primary' />
-    <div className='absolute -bottom-0.5 left-0 w-full h-1 bg-background' />
-  </>
-);

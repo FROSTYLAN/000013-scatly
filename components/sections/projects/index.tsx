@@ -1,20 +1,16 @@
 'use client';
-import React, { useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 
 import LaptopAnimation from './laptop-animation';
 import ProjectCard from './project-card';
-import useCurSection from '@/hooks/use-cur-section';
 import data from '@/data';
 
 export default function ProjectsSection() {
-  const ref = useRef(null);
-  useCurSection(ref, 0.1);
   return (
     <div
-      ref={ref}
       id='projects'
-      className='w-full p-12 flex justify-between flex-col items-center lg:flex-row lg:items-stretch gap-12 container my-32 text-sm md:text-base'
+      className='w-full p-12 lg:flex-row lg:items-stretch gap-12 text-sm md:text-base'
     >
       <div>
         <div className='sticky top-8 text-center md:text-left'>
@@ -27,16 +23,17 @@ export default function ProjectsSection() {
             height={0}
           />
           <h1 className='text-3xl md:text-4xl text-gradient-primary'>
-            <span>{'//'}</span>
-            Recent Projects
+            Proyects
           </h1>
           <LaptopAnimation className='w-[300px] -scale-x-100 scale-y-100 mx-auto md:mx-0' />
-          <p className='w-[400px] text-muted-foreground'>
-            Building, Fixing & Scaling Next.js & AI Apps That Actually Work
-          </p>
         </div>
       </div>
-      <div className='space-y-[60vh]'>
+      <div className='flex gap-8'>
+      <ProjectCard key={"new-project"} project={{
+        id: 1,
+        title: "(New project)",
+        description: "New Project Description",
+      }} />
         {data.projects.projects.map((project) => (
           <ProjectCard key={project.title} project={project} />
         ))}

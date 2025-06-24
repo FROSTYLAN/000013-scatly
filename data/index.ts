@@ -1,5 +1,3 @@
-import { Github, Linkedin, Youtube } from 'lucide-react';
-
 import cw from '@/public/projects-imgs/cw.webp';
 import retrocech from '@/public/projects-imgs/retrocech.webp';
 import ecommerce from '@/public/projects-imgs/e-commerce.webp';
@@ -14,21 +12,6 @@ const data = {
   },
   sidebar: {
     links: [
-      {
-        name: 'github',
-        link: 'https://github.com/agakadela',
-        icon: Github,
-      },
-      {
-        name: 'linkedin',
-        link: 'https://www.linkedin.com/in/agakadela/',
-        icon: Linkedin,
-      },
-      {
-        name: 'youtube',
-        link: 'https://www.youtube.com/@agakadela',
-        icon: Youtube,
-      },
     ],
   },
 
@@ -39,23 +22,18 @@ const data = {
         title: 'Coder Woman Platform',
         description:
           'Platform to sell online courses, helping empower women in tech by making coding education accessible.\n\n Technologies Used: Next.js, React.js, CSS, Stripe API.',
-        image: cw,
-        previewLink: 'https://coderwoman.com',
       },
       {
         id: 2,
         title: 'RetroCech Website',
         description:
           'A professional and visually appealing website that captures the vintage style of the business while ensuring smooth performance and easy navigation. \n\n Technologies Used: Next.js, Tailwind CSS, React.js.',
-        image: retrocech,
-        previewLink: 'https://retrocech.com',
       },
       {
         id: 3,
         title: 'E-commerce Platform',
         description:
           'Worked on one of a biggest e-commerce platform in Poland, as part of a Scrum team for 1.5 years, focusing on checkout and payment workflows. \n\n Technologies Used: Next.js, React.js, Tailwind CSS, Stripe API.',
-        image: ecommerce,
         previewLink: 'https://x-kom.pl',
       },
       {
@@ -63,8 +41,6 @@ const data = {
         title: 'Personal Portfolio Website',
         description:
           'A reliable and polished website that makes it easy for the expert to share their skills and impress potential clients or employers. \n\n Technologies Used: Next.js, React.js, CSS.',
-        image: lukaskadela,
-        previewLink: 'https://lukaskadela.com',
       },
     ],
   },

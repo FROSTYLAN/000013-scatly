@@ -15,7 +15,7 @@ export default function Sidebar() {
       >
         <BorderActive /> <Info />
       </Link>
-      <div>
+      {/* <div>
         {data.sidebar.links.map(
           (link) =>
             link.link && (
@@ -30,8 +30,8 @@ export default function Sidebar() {
                 <link.icon />
               </Link>
             )
-        )}
-      </div>
+        )} 
+      </div> */}
     </div>
   );
 }

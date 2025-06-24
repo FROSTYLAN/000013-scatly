@@ -12,11 +12,11 @@ const firaCode = Fira_Code({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://agakadela.com'),
+  metadataBase: new URL('https://example.com'),
   title: {
     default:
-      'Aga Kadela | Full Stack Product Engineer | AI Integration Specialist',
-    template: '%s | Aga Kadela',
+      'Scatly | Técnica de análisis sistematico de las causas',
+    template: '%s | Chuck Castillo',
   },
   description:
     'Full Stack Product Engineer specializing in Next.js, React, and AI Integration. Expert in building high-performance web applications with modern technologies.',
