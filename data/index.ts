@@ -19,29 +19,29 @@ const data = {
     projects: [
       {
         id: 1,
-        title: 'Coder Woman Platform',
+        title: 'proyecto 1',
         description:
           'Platform to sell online courses, helping empower women in tech by making coding education accessible.\n\n Technologies Used: Next.js, React.js, CSS, Stripe API.',
       },
       {
         id: 2,
-        title: 'RetroCech Website',
+        title: 'proyecto 2',
         description:
           'A professional and visually appealing website that captures the vintage style of the business while ensuring smooth performance and easy navigation. \n\n Technologies Used: Next.js, Tailwind CSS, React.js.',
       },
       {
         id: 3,
-        title: 'E-commerce Platform',
+        title: 'proyecto 3',
         description:
           'Worked on one of a biggest e-commerce platform in Poland, as part of a Scrum team for 1.5 years, focusing on checkout and payment workflows. \n\n Technologies Used: Next.js, React.js, Tailwind CSS, Stripe API.',
         previewLink: 'https://x-kom.pl',
       },
       {
         id: 4,
-        title: 'Personal Portfolio Website',
+        title: 'proyecto 4',
         description:
           'A reliable and polished website that makes it easy for the expert to share their skills and impress potential clients or employers. \n\n Technologies Used: Next.js, React.js, CSS.',
-      },
+      }
     ],
   },
   technologies: {
