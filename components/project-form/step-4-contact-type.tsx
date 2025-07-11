@@ -1,4 +1,4 @@
-import { ProjectData } from '@/types/project';
+import { ProjectData } from '@/types/form-types';
 
 interface Step4Props {
   formData: ProjectData;

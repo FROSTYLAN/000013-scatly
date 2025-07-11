@@ -1,15 +1,29 @@
 import { NextResponse } from 'next/server';
 import { createProject, getAllProjects } from '@/lib/services/project-service';
-import { CreateProjectInput } from '@/types/project-types';
+import { CreateProjectInput } from '@/types/database-types';
 
 export async function GET() {
+  console.log('🔍 GET /api/projects - Iniciando...');
+  
   try {
+    console.log('📊 Obteniendo proyectos de la base de datos...');
     const projects = await getAllProjects();
-    return NextResponse.json(projects);
+    console.log('✅ Proyectos obtenidos:', projects.length);
+    
+    return NextResponse.json({ 
+      success: true,
+      count: projects.length, 
+      projects 
+    });
   } catch (error) {
-    console.error('Error al obtener proyectos:', error);
+    console.error('❌ Error al obtener proyectos:', error);
+    
     return NextResponse.json(
-      { error: 'Error al obtener los proyectos' },
+      { 
+        success: false,
+        error: 'Error al obtener proyectos de la base de datos',
+        details: error instanceof Error ? error.message : 'Error desconocido'
+      },
       { status: 500 }
     );
   }

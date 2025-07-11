@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ProjectData, projectEmpty, CorrectiveAction, BasicFactorItem } from '@/types/project';
+import { ProjectData, projectEmpty, CorrectiveAction, BasicFactorItem } from '@/types/form-types';
 
 export const useProjectForm = () => {
   const [step, setStep] = useState(1);

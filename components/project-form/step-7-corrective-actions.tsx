@@ -1,4 +1,4 @@
-import { ProjectData, CorrectiveAction } from '@/types/project';
+import { ProjectData, CorrectiveAction } from '@/types/form-types';
 
 interface Step7Props {
   formData: ProjectData;

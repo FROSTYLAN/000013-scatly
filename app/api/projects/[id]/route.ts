@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getProjectById, updateProject, deleteProject } from '@/lib/services/project-service';
-import { UpdateProjectInput } from '@/types/project-types';
+import { UpdateProjectInput } from '@/types/database-types';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {

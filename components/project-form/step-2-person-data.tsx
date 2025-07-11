@@ -1,4 +1,4 @@
-import { ProjectData } from '@/types/project';
+import { ProjectData } from '@/types/form-types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
