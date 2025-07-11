@@ -7,6 +7,9 @@ const nextConfig = {
   },
   optimizeFonts: true,
   compress: true,
+  env: {
+    POSTGRES_URL: process.env.POSTGRES_URL,
+  },
 };
 
 export default nextConfig;
