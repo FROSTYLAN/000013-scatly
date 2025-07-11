@@ -59,16 +59,14 @@ export function ProjectForm() {
         return (
           <Step5ImmediateCauses
             formData={formData}
-            updateArrayItem={updateArrayItem}
-            addNewItem={addNewItem}
+            updateFormData={updateFormData}
           />
         );
       case 6:
         return (
           <Step6BasicCauses
             formData={formData}
-            updateArrayItem={updateArrayItem}
-            addNewItem={addNewItem}
+            updateFormData={updateFormData}
           />
         );
       case 7:

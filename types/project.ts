@@ -31,9 +31,9 @@ export type ProjectData = {
   accidentVictim: AccidentVictimData;
 
   // Paso 3: Evaluación Potencial de Pérdida
-  potentialSeverity: string;
-  potentialProbability: string;
-  potentialLossDescription: string;
+  potentialSeverity: 'mayor' | 'grave' | 'menor' | '';
+  potentialProbability: 'alta' | 'moderada' | 'rara' | '';
+  potentialFrequency: 'grande' | 'moderada' | 'baja' | '';
 
   // Paso 4: Tipo de Contacto
   contactType: string;
@@ -72,7 +72,7 @@ export const projectEmpty: ProjectData = {
   },
   potentialSeverity: '',
   potentialProbability: '',
-  potentialLossDescription: '',
+  potentialFrequency: '',
   contactType: '',
   contactDescription: '',
   immediateActionsUnsafe: ['', '', ''],
