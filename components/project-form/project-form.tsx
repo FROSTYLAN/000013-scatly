@@ -3,10 +3,11 @@
 import { useProjectForm } from '@/hooks/useProjectForm';
 import { Step1ProjectData } from './step-1-project-data';
 import { Step2PersonData } from './step-2-person-data';
-import { Step3ContactType } from './step-3-contact-type';
-import { Step4ImmediateCauses } from './step-4-immediate-causes';
-import { Step5BasicCauses } from './step-5-basic-causes';
-import { Step6CorrectiveActions } from './step-6-corrective-actions';
+import { Step3PotentialEvaluation } from './step-3-potential-evaluation';
+import { Step4ContactType } from './step-4-contact-type';
+import { Step5ImmediateCauses } from './step-5-immediate-causes';
+import { Step6BasicCauses } from './step-6-basic-causes';
+import { Step7CorrectiveActions } from './step-7-corrective-actions';
 import { FormNavigation } from './form-navigation';
 import { Button } from '@/components/ui/button';
 
@@ -42,22 +43,21 @@ export function ProjectForm() {
         );
       case 3:
         return (
-          <Step3ContactType
+          <Step3PotentialEvaluation
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 4:
         return (
-          <Step4ImmediateCauses
+          <Step4ContactType
             formData={formData}
-            updateArrayItem={updateArrayItem}
-            addNewItem={addNewItem}
+            updateFormData={updateFormData}
           />
         );
       case 5:
         return (
-          <Step5BasicCauses
+          <Step5ImmediateCauses
             formData={formData}
             updateArrayItem={updateArrayItem}
             addNewItem={addNewItem}
@@ -65,7 +65,15 @@ export function ProjectForm() {
         );
       case 6:
         return (
-          <Step6CorrectiveActions
+          <Step6BasicCauses
+            formData={formData}
+            updateArrayItem={updateArrayItem}
+            addNewItem={addNewItem}
+          />
+        );
+      case 7:
+        return (
+          <Step7CorrectiveActions
             formData={formData}
             updateCorrectiveAction={updateCorrectiveAction}
             addNewCorrectiveAction={addNewCorrectiveAction}
@@ -109,11 +117,11 @@ export function ProjectForm() {
           <Button
             type="button"
             onClick={nextStep}
-            disabled={step === 6}
+            disabled={step === 7}
             size="sm"
             className="min-w-[100px]"
           >
-            {step === 6 ? 'Finalizar' : 'Siguiente'}
+            {step === 7 ? 'Finalizar' : 'Siguiente'}
           </Button>
         </div>
       </div>

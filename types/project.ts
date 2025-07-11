@@ -30,19 +30,24 @@ export type ProjectData = {
   investigator: InvestigatorData;
   accidentVictim: AccidentVictimData;
 
-  // Paso 3: Tipo de Contacto
+  // Paso 3: Evaluación Potencial de Pérdida
+  potentialSeverity: string;
+  potentialProbability: string;
+  potentialLossDescription: string;
+
+  // Paso 4: Tipo de Contacto
   contactType: string;
   contactDescription: string;
 
-  // Paso 4: Causas Inmediatas (CI)
+  // Paso 5: Causas Inmediatas (CI)
   immediateActionsUnsafe: string[];
   immediateConditionsUnsafe: string[];
 
-  // Paso 5: Causas Básicas (CB)
+  // Paso 6: Causas Básicas (CB)
   basicFactorsPersonal: string[];
   basicFactorsWork: string[];
 
-  // Paso 6: Necesidades de Acción Correctiva (NAC)
+  // Paso 7: Necesidades de Acción Correctiva (NAC)
   correctiveActions: CorrectiveAction[];
 }
 
@@ -65,6 +70,9 @@ export const projectEmpty: ProjectData = {
     miningCompany: '',
     employed: ''
   },
+  potentialSeverity: '',
+  potentialProbability: '',
+  potentialLossDescription: '',
   contactType: '',
   contactDescription: '',
   immediateActionsUnsafe: ['', '', ''],

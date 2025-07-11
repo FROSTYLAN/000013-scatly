@@ -10,6 +10,7 @@ interface FormNavigationProps {
 const stepLabels = [
   'Datos del Proyecto',
   'Investigador /Accidentado',
+  'Evaluación Potencial',
   'Tipo de Contacto',
   'Causas Inmediatas',
   'Causas Básicas',
@@ -25,10 +26,10 @@ export function FormNavigation({ step, prevStep, nextStep, showButtons = true }:
         {/* Línea de progreso activa */}
         <div 
           className="absolute top-[14px] left-[19.5px] h-[2px] bg-primary/80 transition-all duration-300 ease-in-out" 
-          style={{ width: `${(step / 6) * 100}%` }}
+          style={{ width: `${(step / 7) * 100}%` }}
         />
         <div className="relative flex justify-between px-8">
-          {Array.from({ length: 6 }, (_, i) => (
+          {Array.from({ length: 7 }, (_, i) => (
             <div key={i} className="flex flex-col items-center group">
               <div
                 className={`w-7 h-7 rounded-full transition-all duration-300 ease-in-out flex items-center justify-center
@@ -72,11 +73,11 @@ export function FormNavigation({ step, prevStep, nextStep, showButtons = true }:
           <Button
             type="button"
             onClick={nextStep}
-            disabled={step === 6}
+            disabled={step === 7}
             size="sm"
             className="min-w-[100px]"
           >
-            {step === 6 ? 'Finalizar' : 'Siguiente'}
+            {step === 7 ? 'Finalizar' : 'Siguiente'}
           </Button>
         </div>
       )}
