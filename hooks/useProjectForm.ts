@@ -71,8 +71,17 @@ export const useProjectForm = () => {
     }));
   };
 
+  const updateNACStatus = (categoryIndex: number, subcategoryIndex: number, status: 'P' | 'E' | 'C' | '') => {
+    const updatedCategories = [...formData.nacCategories];
+    updatedCategories[categoryIndex].subcategories[subcategoryIndex].status = status;
+    setFormData(prev => ({
+      ...prev,
+      nacCategories: updatedCategories
+    }));
+  };
+
   const nextStep = () => {
-    if (step < 6) {
+    if (step < 7) {
       setStep(prev => prev + 1);
     }
   };
@@ -92,6 +101,7 @@ export const useProjectForm = () => {
     updateArrayItem,
     addNewCorrectiveAction,
     updateCorrectiveAction,
+    updateNACStatus,
     nextStep,
     prevStep
   };

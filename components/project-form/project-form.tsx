@@ -21,6 +21,7 @@ export function ProjectForm() {
     updateArrayItem,
     addNewCorrectiveAction,
     updateCorrectiveAction,
+    updateNACStatus,
     nextStep,
     prevStep
   } = useProjectForm();
@@ -73,8 +74,7 @@ export function ProjectForm() {
         return (
           <Step7CorrectiveActions
             formData={formData}
-            updateCorrectiveAction={updateCorrectiveAction}
-            addNewCorrectiveAction={addNewCorrectiveAction}
+            updateNACStatus={updateNACStatus}
           />
         );
       default:

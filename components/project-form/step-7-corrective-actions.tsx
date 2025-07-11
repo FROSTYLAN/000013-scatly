@@ -1,92 +1,63 @@
 import { ProjectData, CorrectiveAction } from '@/types/project';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Step7Props {
   formData: ProjectData;
-  updateCorrectiveAction: (index: number, field: keyof CorrectiveAction, value: string) => void;
-  addNewCorrectiveAction: () => void;
+  updateNACStatus: (categoryIndex: number, subcategoryIndex: number, status: 'P' | 'E' | 'C' | '') => void;
 }
 
 export function Step7CorrectiveActions({ 
   formData, 
-  updateCorrectiveAction, 
-  addNewCorrectiveAction 
+  updateNACStatus
 }: Step7Props) {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Necesidades de Acción Correctiva (NAC)</h2>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold text-center uppercase mb-6">Necesidades de Acción de Control (NAC) = Falta de Control</h2>
       
-      <div className="space-y-6">
-        {formData.correctiveActions.map((action, index) => (
-          <div key={`action-${index}`} className="p-4 border rounded-lg space-y-4">
-            <h3 className="text-lg font-semibold">Acción Correctiva {index + 1}</h3>
+      {/* NAC Categories */}
+      <div className="space-y-6 bg-amber-50/50 p-6 rounded-lg border border-amber-200">
+        {formData.nacCategories.map((category, categoryIndex) => (
+          <div key={`category-${categoryIndex}`} className="space-y-4">
+            <h3 className="text-xl font-semibold text-amber-900">{category.category}</h3>
             
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor={`action-${index}`}>Acción</Label>
-                <Textarea
-                  id={`action-${index}`}
-                  value={action.action}
-                  onChange={(e) => updateCorrectiveAction(index, 'action', e.target.value)}
-                  placeholder="Describa la acción correctiva"
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor={`responsible-${index}`}>Responsable</Label>
-                <Input
-                  id={`responsible-${index}`}
-                  value={action.responsible}
-                  onChange={(e) => updateCorrectiveAction(index, 'responsible', e.target.value)}
-                  placeholder="Nombre del responsable"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor={`deadline-${index}`}>Fecha Límite</Label>
-                <Input
-                  id={`deadline-${index}`}
-                  type="date"
-                  value={action.deadline}
-                  onChange={(e) => updateCorrectiveAction(index, 'deadline', e.target.value)}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor={`status-${index}`}>Estado</Label>
-                <Select
-                  value={action.status}
-                  onValueChange={(value) => updateCorrectiveAction(index, 'status', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccione el estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pendiente</SelectItem>
-                    <SelectItem value="in-progress">En Progreso</SelectItem>
-                    <SelectItem value="completed">Completado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid gap-2">
+              {category.subcategories.map((subcategory, subcategoryIndex) => (
+                <div key={`subcategory-${categoryIndex}-${subcategoryIndex}`} 
+                     className="flex items-center gap-4 p-2 hover:bg-amber-100/50 rounded border border-amber-100">
+                  <span className="min-w-[60px] font-medium text-amber-800">{subcategory.code}</span>
+                  <span className="flex-1 text-amber-950">{subcategory.description}</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => updateNACStatus(categoryIndex, subcategoryIndex, 'P')}
+                      className={`px-3 py-1 rounded transition-colors ${subcategory.status === 'P' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'}`}
+                    >
+                      P
+                    </button>
+                    <button
+                      onClick={() => updateNACStatus(categoryIndex, subcategoryIndex, 'E')}
+                      className={`px-3 py-1 rounded transition-colors ${subcategory.status === 'E' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'}`}
+                    >
+                      E
+                    </button>
+                    <button
+                      onClick={() => updateNACStatus(categoryIndex, subcategoryIndex, 'C')}
+                      className={`px-3 py-1 rounded transition-colors ${subcategory.status === 'C' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'}`}
+                    >
+                      C
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addNewCorrectiveAction}
-          className="w-full"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Agregar Nueva Acción Correctiva
-        </Button>
+      </div>
+      <div className="bg-gray-100 p-4 rounded-lg">
+        <h4 className="font-semibold mb-2">Leyenda:</h4>
+        <div className="space-y-1">
+          <p>P = Pendiente</p>
+          <p>E = En proceso</p>
+          <p>C = Completado</p>
+        </div>
       </div>
     </div>
   );
