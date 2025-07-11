@@ -51,9 +51,9 @@ export function Step7CorrectiveActions({
           </div>
         ))}
       </div>
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h4 className="font-semibold mb-2">Leyenda:</h4>
-        <div className="space-y-1">
+      <div className="bg-amber-50/50 p-4 rounded-lg border border-amber-200">
+        <h4 className="font-semibold mb-2 text-amber-900">Leyenda:</h4>
+        <div className="space-y-1 text-amber-800">
           <p>P = Pendiente</p>
           <p>E = En proceso</p>
           <p>C = Completado</p>

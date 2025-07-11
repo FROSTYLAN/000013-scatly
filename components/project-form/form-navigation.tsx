@@ -22,10 +22,10 @@ export function FormNavigation({ step, prevStep, nextStep, showButtons = true }:
     <div className="flex flex-col space-y-6">
       <div className="relative">
         {/* Línea de progreso base */}
-        <div className="absolute top-[14px] left-[19.5px] right-[19.5px] h-[2px] bg-gray-100" />
+        <div className="absolute top-[14px] h-[2px] bg-gray-100" />
         {/* Línea de progreso activa */}
         <div 
-          className="absolute top-[14px] left-[19.5px] h-[2px] bg-primary/80 transition-all duration-300 ease-in-out" 
+          className="absolute top-[14px] h-[2px] bg-primary/80 transition-all duration-300 ease-in-out" 
           style={{ width: `${(step / 7) * 100}%` }}
         />
         <div className="relative flex justify-between px-8">
