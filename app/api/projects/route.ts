@@ -12,6 +12,7 @@ export async function GET() {
     
     return NextResponse.json({ 
       success: true,
+      timestamp: new Date().toISOString(),
       count: projects.length, 
       projects 
     });
@@ -21,6 +22,7 @@ export async function GET() {
     return NextResponse.json(
       { 
         success: false,
+        timestamp: new Date().toISOString(),
         error: 'Error al obtener proyectos de la base de datos',
         details: error instanceof Error ? error.message : 'Error desconocido'
       },
@@ -30,14 +32,31 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  console.log('📝 POST /api/projects - Iniciando...');
+  
   try {
     const input: CreateProjectInput = await request.json();
+    console.log('📊 Creando nuevo proyecto:', input.nombre);
+    
     const project = await createProject(input);
-    return NextResponse.json(project, { status: 201 });
+    console.log('✅ Proyecto creado con ID:', project.id);
+    
+    return NextResponse.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      message: 'Proyecto creado exitosamente',
+      project
+    }, { status: 201 });
   } catch (error) {
-    console.error('Error al crear proyecto:', error);
+    console.error('❌ Error al crear proyecto:', error);
+    
     return NextResponse.json(
-      { error: 'Error al crear el proyecto' },
+      { 
+        success: false,
+        timestamp: new Date().toISOString(),
+        error: 'Error al crear el proyecto',
+        details: error instanceof Error ? error.message : 'Error desconocido'
+      },
       { status: 500 }
     );
   }

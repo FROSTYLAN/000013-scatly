@@ -8,13 +8,6 @@ import {
 } from '@/components/ui/resizable';
 import Sidebar from '@/components/layout/sidebar';
 
-const LinesNumber = dynamic(() => import('@/components/layout/lines-numbers'), {
-  ssr: false,
-});
-const Terminal = dynamic(() => import('@/components/layout/terminal'), {
-  ssr: false,
-});
-
 export default function MainLayout({
   children,
 }: {
@@ -29,7 +22,6 @@ export default function MainLayout({
         <ResizablePanelGroup direction='vertical' className='size-full'>
           <ResizablePanel defaultSize={91}>
             <div className='size-full flex overflow-hidden'>
-              {/* <LinesNumber /> */}
               <div
                 id='scroll'
                 className='size-full overflow-y-auto overflow-x-hidden scroll-smooth'
@@ -39,14 +31,6 @@ export default function MainLayout({
             </div>
           </ResizablePanel>
           <ResizableHandle className='hidden sm:block' withHandle />
-          {/* <ResizablePanel
-            className='hidden sm:block'
-            defaultSize={9}
-            minSize={4}
-            maxSize={25}
-          >
-            <Terminal />
-          </ResizablePanel> */}
         </ResizablePanelGroup>
       </div>
       <Footer />
