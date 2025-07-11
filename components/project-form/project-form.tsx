@@ -17,11 +17,8 @@ export function ProjectForm() {
     formData,
     updateFormData,
     updateNestedFormData,
-    addNewItem,
-    updateArrayItem,
-    addNewCorrectiveAction,
-    updateCorrectiveAction,
     updateNACStatus,
+    updateNACComment,
     nextStep,
     prevStep
   } = useProjectForm();
@@ -75,6 +72,7 @@ export function ProjectForm() {
           <Step7CorrectiveActions
             formData={formData}
             updateNACStatus={updateNACStatus}
+            updateNACComment={updateNACComment}
           />
         );
       default:

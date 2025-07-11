@@ -7,10 +7,10 @@ interface Step3PotentialEvaluationProps {
 
 export function Step3PotentialEvaluation({ formData, updateFormData }: Step3PotentialEvaluationProps) {
   return (
-    <div className="space-y-6 bg-yellow-50/50 p-6 rounded-lg">
-      <h2 className="text-lg font-semibold mb-6 text-center uppercase">Evaluación Potencial de Pérdida si no es Controlado</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Evaluación Potencial de Pérdida si no es Controlado</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="space-y-8">
         {/* Potencial de Severidad de Pérdida */}
         <div className="space-y-4">
           <label className="font-medium block">Potencial de Severidad de Pérdida</label>
@@ -49,6 +49,15 @@ export function Step3PotentialEvaluation({ formData, updateFormData }: Step3Pote
               <span>Menor (C)</span>
             </label>
           </div>
+          {formData.potentialSeverity && (
+            <textarea
+              placeholder="Agregar un comentario..."
+              value={formData.potentialSeverityComment || ''}
+              onChange={(e) => updateFormData('potentialSeverityComment', e.target.value)}
+              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+              rows={2}
+            />
+          )}
         </div>
 
         {/* Probabilidad de Ocurrencia */}
@@ -89,6 +98,15 @@ export function Step3PotentialEvaluation({ formData, updateFormData }: Step3Pote
               <span>Rara (C)</span>
             </label>
           </div>
+          {formData.potentialProbability && (
+            <textarea
+              placeholder="Agregar un comentario..."
+              value={formData.potentialProbabilityComment || ''}
+              onChange={(e) => updateFormData('potentialProbabilityComment', e.target.value)}
+              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+              rows={2}
+            />
+          )}
         </div>
 
         {/* Frecuencia de Exposición */}
@@ -129,6 +147,15 @@ export function Step3PotentialEvaluation({ formData, updateFormData }: Step3Pote
               <span>Baja (C)</span>
             </label>
           </div>
+          {formData.potentialFrequency && (
+            <textarea
+              placeholder="Agregar un comentario..."
+              value={formData.potentialFrequencyComment || ''}
+              onChange={(e) => updateFormData('potentialFrequencyComment', e.target.value)}
+              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+              rows={2}
+            />
+          )}
         </div>
       </div>
     </div>

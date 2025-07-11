@@ -54,31 +54,64 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
     }
   ];
 
+  const toggleContactType = (title: string) => {
+    const currentTypes = formData.contactTypes || [];
+    const typeIndex = currentTypes.findIndex(t => t.title === title);
+    
+    if (typeIndex >= 0) {
+      // Si ya existe, lo removemos
+      const newTypes = currentTypes.filter(t => t.title !== title);
+      updateFormData('contactTypes', newTypes);
+    } else {
+      // Si no existe, lo agregamos con un comentario vacío
+      updateFormData('contactTypes', [...currentTypes, { title, comment: '' }]);
+    }
+  };
+
+  const updateComment = (title: string, comment: string) => {
+    const currentTypes = formData.contactTypes || [];
+    const newTypes = currentTypes.map(t => 
+      t.title === title ? { ...t, comment } : t
+    );
+    updateFormData('contactTypes', newTypes);
+  };
+
   return (
-    <div className="space-y-6 bg-yellow-50/50 p-6 rounded-lg">
-      <h2 className="text-lg font-semibold mb-6 text-center uppercase">Tipo de Contacto o Cuasi Contacto con Energía o Sustancia</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Tipo de Contacto o Cuasi Contacto con Energía o Sustancia</h2>
       
       <div className="space-y-4">
-        {contactTypes.map((type) => (
-          <label key={type.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-yellow-100/50 cursor-pointer">
-            <input
-              type="radio"
-              name="contactType"
-              value={type.title}
-              checked={formData.contactType === type.title}
-              onChange={(e) => updateFormData('contactType', e.target.value)}
-              className="mt-1 form-radio"
-            />
-            <div className="space-y-1">
-              <div className="font-medium">
-                {type.id}. {type.title}
+        {contactTypes.map((type) => {
+          const isSelected = formData.contactTypes?.some(t => t.title === type.title) || false;
+          const currentComment = formData.contactTypes?.find(t => t.title === type.title)?.comment || '';
+
+          return (
+            <label key={type.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-amber-100/10 cursor-pointer transition-colors duration-200">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => toggleContactType(type.title)}
+                className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
+              />
+              <div className="space-y-2 flex-1">
+                <div className="font-medium">
+                  {type.id}. {type.title}
+                </div>
+                {isSelected && (
+                  <div className="mt-2">
+                    <textarea
+                      placeholder="Agregar un comentario..."
+                      value={currentComment}
+                      onChange={(e) => updateComment(type.title, e.target.value)}
+                      className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                      rows={3}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="text-sm text-gray-600">
-                {type.reference}
-              </div>
-            </div>
-          </label>
-        ))}
+            </label>
+          );
+        })}
       </div>
     </div>
   );

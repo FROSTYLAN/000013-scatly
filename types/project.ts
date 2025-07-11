@@ -1,3 +1,25 @@
+export type ImmediateCauseItem = {
+  text: string;
+  comment: string;
+  reference: string;
+  subcauses: Array<{
+    text: string;
+    selected: boolean;
+    comment: string;
+  }>;
+}
+
+export type BasicFactorItem = {
+  text: string;
+  comment: string;
+  category: string;
+  subcauses: Array<{
+    text: string;
+    selected: boolean;
+    comment: string;
+  }>;
+}
+
 export type PersonData = {
   name: string;
   lastName: string;
@@ -26,6 +48,7 @@ export type NACCategory = {
     code: string;
     description: string;
     status: 'P' | 'E' | 'C' | '';
+    comment: string;
   }[];
 }
 
@@ -41,20 +64,27 @@ export type ProjectData = {
 
   // Paso 3: Evaluación Potencial de Pérdida
   potentialSeverity: 'mayor' | 'grave' | 'menor' | '';
+  potentialSeverityComment: string;
   potentialProbability: 'alta' | 'moderada' | 'rara' | '';
+  potentialProbabilityComment: string;
   potentialFrequency: 'grande' | 'moderada' | 'baja' | '';
+  potentialFrequencyComment: string;
 
   // Paso 4: Tipo de Contacto
-  contactType: string;
+  contactTypes: Array<{
+    title: string;
+    comment: string;
+  }>;
   contactDescription: string;
+  contactComment: string;
 
   // Paso 5: Causas Inmediatas (CI)
-  immediateActionsUnsafe: string[];
-  immediateConditionsUnsafe: string[];
+  immediateActionsUnsafe: ImmediateCauseItem[];
+  immediateConditionsUnsafe: ImmediateCauseItem[];
 
   // Paso 6: Causas Básicas (CB)
-  basicFactorsPersonal: string[];
-  basicFactorsWork: string[];
+  basicFactorsPersonal: BasicFactorItem[];
+  basicFactorsWork: BasicFactorItem[];
 
   // Paso 7: Necesidades de Acción Correctiva (NAC)
   nacCategories: NACCategory[];
@@ -81,39 +111,43 @@ export const projectEmpty: ProjectData = {
     employed: ''
   },
   potentialSeverity: '',
+  potentialSeverityComment: '',
   potentialProbability: '',
+  potentialProbabilityComment: '',
   potentialFrequency: '',
-  contactType: '',
+  potentialFrequencyComment: '',
+  contactTypes: [],
   contactDescription: '',
-  immediateActionsUnsafe: ['', '', ''],
-  immediateConditionsUnsafe: ['', '', ''],
-  basicFactorsPersonal: ['', '', ''],
-  basicFactorsWork: ['', '', ''],
+  contactComment: '',
+  immediateActionsUnsafe: [],
+  immediateConditionsUnsafe: [],
+  basicFactorsPersonal: [],
+  basicFactorsWork: [],
   nacCategories: [
     {
       category: 'LIDERAZGO Y ADMINISTRACIÓN',
       subcategories: [
-        { code: '1.1', description: 'Política General', status: '' },
-        { code: '1.2', description: 'Coordinación de Programa', status: '' },
-        { code: '1.3', description: 'Participación de la Gerencia', status: '' },
-        { code: '1.4', description: 'Estándares de Desempeño Gerencial', status: '' },
-        { code: '1.5', description: 'Participación de la Supervisión', status: '' },
-        { code: '1.6', description: 'Reuniones de la Gerencia', status: '' },
-        { code: '1.7', description: 'Manual de Referencia de Gerencia', status: '' },
-        { code: '1.8', description: 'Revisión de las Operaciones', status: '' },
-        { code: '1.9', description: 'Comité Central de Seguridad y Salud / Control de Pérdidas', status: '' },
-        { code: '1.10', description: 'Comité de Seguridad y Salud por Áreas', status: '' },
-        { code: '1.11', description: 'Comité Operativo de Seguridad y Salud por Delegados de Trabajadores', status: '' },
-        { code: '1.12', description: 'Auditoría y Revisión del Sistema de Gestión de Seguridad', status: '' },
-        { code: '1.13', description: 'Biblioteca de Referencia', status: '' }
+        { code: '1.1', description: 'Política General', status: '', comment: '' },
+        { code: '1.2', description: 'Coordinación de Programa', status: '', comment: '' },
+        { code: '1.3', description: 'Participación de la Gerencia', status: '', comment: '' },
+        { code: '1.4', description: 'Estándares de Desempeño Gerencial', status: '', comment: '' },
+        { code: '1.5', description: 'Participación de la Supervisión', status: '', comment: '' },
+        { code: '1.6', description: 'Reuniones de la Gerencia', status: '', comment: '' },
+        { code: '1.7', description: 'Manual de Referencia de Gerencia', status: '', comment: '' },
+        { code: '1.8', description: 'Revisión de las Operaciones', status: '', comment: '' },
+        { code: '1.9', description: 'Comité Central de Seguridad y Salud / Control de Pérdidas', status: '', comment: '' },
+        { code: '1.10', description: 'Comité de Seguridad y Salud por Áreas', status: '', comment: '' },
+        { code: '1.11', description: 'Comité Operativo de Seguridad y Salud por Delegados de Trabajadores', status: '', comment: '' },
+        { code: '1.12', description: 'Auditoría y Revisión del Sistema de Gestión de Seguridad', status: '', comment: '' },
+        { code: '1.13', description: 'Biblioteca de Referencia', status: '', comment: '' }
       ]
     },
     {
       category: 'ENTRENAMIENTO DEL PERSONAL',
       subcategories: [
-        { code: '2.1', description: 'Análisis de Necesidades de Entrenamiento', status: '' },
-        { code: '2.2', description: 'Programa de Entrenamiento del Personal', status: '' },
-        { code: '2.3', description: 'Evaluación del Programa de Entrenamiento', status: '' }
+        { code: '2.1', description: 'Análisis de Necesidades de Entrenamiento', status: '', comment: '' },
+        { code: '2.2', description: 'Programa de Entrenamiento del Personal', status: '', comment: '' },
+        { code: '2.3', description: 'Evaluación del Programa de Entrenamiento', status: '', comment: '' }
       ]
     }
   ],

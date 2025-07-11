@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ProjectData, projectEmpty, CorrectiveAction } from '@/types/project';
+import { ProjectData, projectEmpty, CorrectiveAction, BasicFactorItem } from '@/types/project';
 
 export const useProjectForm = () => {
   const [step, setStep] = useState(1);
@@ -18,7 +18,7 @@ export const useProjectForm = () => {
     setFormData(prev => ({
       ...prev,
       [parentField]: {
-        ...(prev[parentField] as string[]),
+        ...(prev[parentField] as any[]),
         [field]: value
       }
     }));
@@ -28,14 +28,14 @@ export const useProjectForm = () => {
     if (Array.isArray(formData[field])) {
       setFormData(prev => ({
         ...prev,
-        [field]: [...prev[field] as string[], '']
+        [field]: [...prev[field] as any[], '']
       }));
     }
   };
 
   const updateArrayItem = (field: keyof ProjectData, index: number, value: string) => {
     if (Array.isArray(formData[field])) {
-      const newArray = [...formData[field] as string[]];
+      const newArray = [...formData[field] as any[]];
       newArray[index] = value;
       setFormData(prev => ({
         ...prev,
@@ -80,6 +80,41 @@ export const useProjectForm = () => {
     }));
   };
 
+  const updateBasicFactorComment = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string, comment: string) => {
+    const currentItems = formData[field] || [];
+    const newItems = currentItems.map(item =>
+      item.text === text ? { ...item, comment } : item
+    );
+    setFormData(prev => ({
+      ...prev,
+      [field]: newItems
+    }));
+  };
+
+  const toggleBasicFactor = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string, category: string) => {
+    const currentItems = formData[field] || [];
+    const existingItemIndex = currentItems.findIndex(item => item.text === text);
+
+    if (existingItemIndex >= 0) {
+      const newItems = currentItems.filter(item => item.text !== text);
+      setFormData(prev => ({
+        ...prev,
+        [field]: newItems
+      }));
+    } else {
+      const newItem: BasicFactorItem = {
+        text,
+        comment: '',
+        category,
+        subcauses: []
+      };
+      setFormData(prev => ({
+        ...prev,
+        [field]: [...currentItems, newItem]
+      }));
+    }
+  };
+
   const nextStep = () => {
     if (step < 7) {
       setStep(prev => prev + 1);
@@ -92,6 +127,15 @@ export const useProjectForm = () => {
     }
   };
 
+  const updateNACComment = (categoryIndex: number, subcategoryIndex: number, comment: string) => {
+    const updatedCategories = [...formData.nacCategories];
+    updatedCategories[categoryIndex].subcategories[subcategoryIndex].comment = comment;
+    setFormData(prev => ({
+      ...prev,
+      nacCategories: updatedCategories
+    }));
+  };
+
   return {
     step,
     formData,
@@ -102,6 +146,9 @@ export const useProjectForm = () => {
     addNewCorrectiveAction,
     updateCorrectiveAction,
     updateNACStatus,
+    updateNACComment,
+    updateBasicFactorComment,
+    toggleBasicFactor,
     nextStep,
     prevStep
   };
