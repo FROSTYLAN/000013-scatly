@@ -75,8 +75,6 @@ export type ProjectData = {
     title: string;
     comment: string;
   }>;
-  contactDescription: string;
-  contactComment: string;
 
   // Paso 5: Causas Inmediatas (CI)
   immediateActionsUnsafe: ImmediateCauseItem[];
@@ -117,8 +115,6 @@ export const projectEmpty: ProjectData = {
   potentialFrequency: '',
   potentialFrequencyComment: '',
   contactTypes: [],
-  contactDescription: '',
-  contactComment: '',
   immediateActionsUnsafe: [],
   immediateConditionsUnsafe: [],
   basicFactorsPersonal: [],

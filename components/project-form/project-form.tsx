@@ -112,8 +112,14 @@ export function ProjectForm() {
 
           <Button
             type="button"
-            onClick={nextStep}
-            disabled={step === 7}
+            onClick={() => {
+              if (step === 7) {
+                console.log('Formulario a enviar:', JSON.stringify(formData, null, 2));
+              } else {
+                nextStep();
+              }
+            }}
+            disabled={false}
             size="sm"
             className="min-w-[100px]"
           >
