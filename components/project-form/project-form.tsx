@@ -10,17 +10,26 @@ import { Step6BasicCauses } from './step-6-basic-causes';
 import { Step7CorrectiveActions } from './step-7-corrective-actions';
 import { FormNavigation } from './form-navigation';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export function ProjectForm() {
+  const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  
   const {
     step,
     formData,
+    loading,
+    error,
     updateFormData,
     updateNestedFormData,
     updateNACStatus,
     updateNACComment,
     nextStep,
-    prevStep
+    prevStep,
+    saveProject
   } = useProjectForm();
 
   const renderStep = () => {
@@ -80,6 +89,39 @@ export function ProjectForm() {
     }
   };
 
+  // Si está cargando, mostrar un indicador de carga
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto flex flex-col min-h-screen justify-center items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+        <p className="mt-4 text-lg">Cargando datos del proyecto...</p>
+      </div>
+    );
+  }
+
+  // Si hay un error, mostrar un mensaje de error
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto flex flex-col min-h-screen justify-center items-center">
+        <div className="text-center p-6 bg-red-50 rounded-lg border border-red-200 max-w-md w-full">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="text-lg font-medium text-red-800 mb-2">Error</h3>
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => window.history.back()}
+            className="mt-2 w-full"
+          >
+            Volver
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto flex flex-col min-h-screen">
       <div className="sticky top-0 z-10 bg-background border-b">
@@ -112,19 +154,45 @@ export function ProjectForm() {
 
           <Button
             type="button"
-            onClick={() => {
+            onClick={async () => {
               if (step === 7) {
-                console.log('Formulario a enviar:', JSON.stringify(formData, null, 2));
+                try {
+                  setIsSaving(true);
+                  setSaveError(null);
+                  console.log('Formulario a enviar:', JSON.stringify(formData, null, 2));
+                  
+                  const result = await saveProject();
+                  
+                  if (result.success) {
+                    // Redirigir a la página principal después de guardar
+                    router.push('/');
+                  } else {
+                    setSaveError('Error al guardar el proyecto. Por favor, inténtalo de nuevo.');
+                  }
+                } catch (err) {
+                  console.error('Error al guardar:', err);
+                  setSaveError('Error al guardar el proyecto. Por favor, inténtalo de nuevo.');
+                } finally {
+                  setIsSaving(false);
+                }
               } else {
                 nextStep();
               }
             }}
-            disabled={false}
+            disabled={isSaving}
             size="sm"
             className="min-w-[100px]"
           >
-            {step === 7 ? 'Finalizar' : 'Siguiente'}
+            {step === 7 
+              ? (isSaving ? 'Guardando...' : 'Finalizar') 
+              : 'Siguiente'}
           </Button>
+          
+          {saveError && (
+            <div className="absolute bottom-16 right-4 bg-red-100 text-red-800 p-3 rounded-md shadow-md">
+              {saveError}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,11 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { ProjectData, projectEmpty, CorrectiveAction, BasicFactorItem } from '@/types/form-types';
 
 export const useProjectForm = () => {
+  const params = useParams();
+  const projectId = params?.id ? Number(params.id) : null;
+  
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<ProjectData>(projectEmpty);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Cargar datos del proyecto si existe un ID
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (!projectId || projectId <= 1) return; // No cargar para nuevos proyectos o la página principal
+      
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/projects/${projectId}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Datos del proyecto cargados:', data);
+        
+        if (data.success && data.project) {
+          // Transformar los datos de la API al formato del formulario
+          setFormData({
+            ...projectEmpty,
+            name: data.project.nombre || '',
+            description: data.project.descripcion || '',
+            date: data.project.fecha || '',
+            // Nota: Los datos de persona no existen en la base de datos actual
+            // pero mantenemos la estructura del formulario intacta
+            investigator: {
+              ...projectEmpty.investigator
+              // Aquí se podrían mapear datos del investigador si existieran en la API
+            },
+            accidentVictim: {
+              ...projectEmpty.accidentVictim
+              // Aquí se podrían mapear datos de la víctima si existieran en la API
+            }
+            // Aquí puedes mapear otros campos según sea necesario
+          });
+        }
+      } catch (err) {
+        console.error('Error al cargar el proyecto:', err);
+        setError('Error al cargar la información del proyecto. Por favor, inténtalo de nuevo más tarde.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProjectData();
+  }, [projectId]);
 
   const updateFormData = (field: keyof ProjectData, value: any) => {
     setFormData(prev => ({
@@ -136,9 +189,57 @@ export const useProjectForm = () => {
     }));
   };
 
+  // Función para guardar el proyecto en la base de datos
+  const saveProject = async () => {
+    try {
+      setLoading(true);
+      
+      // Preparar los datos para enviar a la API
+      const projectData = {
+        nombre: formData.name,
+        descripcion: formData.description,
+        fecha: formData.date
+        // Nota: Actualmente la API solo acepta estos campos
+        // En el futuro, se podría extender para incluir más datos
+      };
+      
+      // Determinar si es una creación o actualización
+      const url = projectId && projectId > 1 
+        ? `/api/projects/${projectId}` 
+        : '/api/projects';
+      
+      const method = projectId && projectId > 1 ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Proyecto guardado:', data);
+      
+      return { success: true, data };
+    } catch (err) {
+      console.error('Error al guardar el proyecto:', err);
+      setError('Error al guardar la información del proyecto. Por favor, inténtalo de nuevo más tarde.');
+      return { success: false, error: err };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     step,
     formData,
+    loading,
+    error,
     updateFormData,
     updateNestedFormData,
     addNewItem,
@@ -150,6 +251,7 @@ export const useProjectForm = () => {
     updateBasicFactorComment,
     toggleBasicFactor,
     nextStep,
-    prevStep
+    prevStep,
+    saveProject
   };
 };

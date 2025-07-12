@@ -12,7 +12,7 @@ type NavStore = {
     activeNavId: number;
     navItems: NavItem[];
     setActiveNavId: (id: number) => void;
-    addNavItem: (item?: NavItem) => void;
+    addNavItem: (item?: any) => number;
     removeNavItem: (item: NavItem) => void;
 };
 
@@ -35,16 +35,33 @@ export const useNavStore = create<NavStore>((set) => ({
         let newId: number = 0;
         
         set((state) => {
-            newId = state.navItems.length + 1;
+            // Si el item tiene un ID, lo usamos; de lo contrario, generamos uno nuevo
+            const itemId = item && item.id ? item.id : state.navItems.length + 1;
+            newId = itemId;
+            
+            // Verificamos si ya existe un item con este ID
+            const existingItemIndex = state.navItems.findIndex(navItem => navItem.id === itemId);
+            
+            // Si ya existe, solo actualizamos el activeNavId
+            if (existingItemIndex !== -1) {
+                return { activeNavId: itemId };
+            }
+            
+            // Si no existe, lo añadimos
+            // Determinar la ruta según si es un proyecto existente o nuevo
+            const isExisting = item && item.isExisting;
+            const path = isExisting ? `/project/${itemId}` : `/new/${itemId}`;
+            
             const newNavItems = [...state.navItems, {
-                id: newId,
+                id: itemId,
                 name: item ? item.name : '(New project)',
-                path: '/project/' + newId,
+                path: path,
                 icon: item ? File : FilePlus2,
             }];
+            
             return { 
                 navItems: newNavItems,
-                activeNavId: newId
+                activeNavId: itemId
             };
         });
 

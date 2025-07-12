@@ -17,8 +17,19 @@ export default function ProjectCard({ project }: props) {
   const { addNavItem } = useNavStore();
 
   const handleAddProject = (item: any) => {
-    const newId = addNavItem(item);
-    router.push(`/project/${newId}`);
+    // Si es un nuevo proyecto, usamos el ID generado por el store
+    if (project.id === 0) {
+      const newId = addNavItem(item);
+      router.push(`/new/${newId}`);
+    } else {
+      // Si es un proyecto existente, usamos su ID real y marcamos que es existente
+      addNavItem({
+        ...item,
+        id: project.id,
+        isExisting: true
+      });
+      router.push(`/project/${project.id}`);
+    }
   };
 
   return (

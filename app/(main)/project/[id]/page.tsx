@@ -1,5 +1,5 @@
-import { ProjectForm } from '@/components/project-form/project-form';
+import { ProjectDetail } from '@/components/project-detail/project-detail';
 
 export default function ProjectPage() {
-  return <ProjectForm />;
+  return <ProjectDetail />;
 }
