@@ -9,7 +9,18 @@ export const useProjectForm = () => {
   const projectId = params?.id ? Number(params.id) : null;
   
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<ProjectData>(projectEmpty);
+  const [formData, setFormData] = useState<ProjectData>(() => {
+    // Para proyectos nuevos, inicializar con un objeto vacío sin acciones correctivas ni categorías NAC
+    if (!params?.id || Number(params.id) <= 1) {
+      return {
+        ...projectEmpty,
+        correctiveActions: [],
+        nacCategories: []
+      };
+    }
+    // Para proyectos existentes, usar projectEmpty completo
+    return projectEmpty;
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
