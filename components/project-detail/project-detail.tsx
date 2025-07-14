@@ -10,7 +10,7 @@ import { useNavStore } from '@/store/use-nav-store';
 export function ProjectDetail() {
   const params = useParams();
   const router = useRouter();
-  const { addNavItem, setActiveNavId, setActivePath } = useNavStore();
+  const { addNavItem, setActivePath } = useNavStore();
   const projectId = params?.id ? Number(params.id) : null;
   
   const [project, setProject] = useState<Project | null>(null);
@@ -27,9 +27,27 @@ export function ProjectDetail() {
       
       try {
         setLoading(true);
-        const response = await fetch(`/api/projects/${projectId}`);
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          console.log('No hay token, redirigiendo al login');
+          window.location.href = '/login';
+          return;
+        }
+        
+        const response = await fetch(`/api/projects/${projectId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
         if (!response.ok) {
+          if (response.status === 401) {
+            console.log('Token inválido, redirigiendo al login');
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login';
+            return;
+          }
           throw new Error(`Error: ${response.status}`);
         }
         
@@ -205,6 +223,7 @@ export function ProjectDetail() {
                       try {
                         const response = await fetch(`/api/projects/${projectId}`, {
                           method: 'DELETE',
+                          credentials: 'include'
                         });
                         
                         if (response.ok) {

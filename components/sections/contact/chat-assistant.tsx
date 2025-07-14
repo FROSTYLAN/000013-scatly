@@ -99,6 +99,7 @@ export default function ChatAssistant() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: 'include',
           body: JSON.stringify({
             messages: chatMessages.slice(-MESSAGE_HISTORY_LIMIT),
             config: {

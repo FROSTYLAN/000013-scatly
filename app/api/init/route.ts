@@ -3,16 +3,22 @@ import { db } from '@/lib/database';
 
 async function resetDatabase() {
   try {
-    // Eliminar tabla existente
-    console.log('🗑️ Eliminando tabla projects existente...');
-    await db.query('DROP TABLE IF EXISTS projects CASCADE');
+    console.log('🧹 Limpiando base de datos...');
     
-    // Eliminar función y trigger si existen
+    // Eliminar tablas si existen
+    await db.query('DROP TABLE IF EXISTS projects CASCADE');
+    await db.query('DROP TABLE IF EXISTS users CASCADE');
+    
+    // Eliminar función de actualización si existe
     await db.query('DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE');
     
-    console.log('✅ Base de datos limpiada');
+    // Eliminar triggers si existen
+    await db.query('DROP TRIGGER IF EXISTS update_projects_updated_at ON projects CASCADE');
+    await db.query('DROP TRIGGER IF EXISTS update_users_updated_at ON users CASCADE');
+    
+    console.log('✅ Base de datos limpiada exitosamente');
   } catch (error) {
-    console.error('❌ Error limpiando base de datos:', error);
+    console.error('❌ Error al limpiar la base de datos:', error);
     throw error;
   }
 }
@@ -105,6 +111,86 @@ async function insertTestData() {
   }
 }
 
+async function createUsersTable() {
+  try {
+    // Crear función para actualizar automáticamente updated_at si no existe
+    await db.query(`
+      CREATE OR REPLACE FUNCTION update_updated_at_column()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.updated_at = NOW();
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `);
+
+    // Crear tabla de usuarios
+    await db.query(`
+      CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        role VARCHAR(20) NOT NULL DEFAULT 'user',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    // Crear trigger para actualizar automáticamente updated_at
+    await db.query(`
+      CREATE TRIGGER update_users_updated_at
+        BEFORE UPDATE ON users
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    `);
+
+    console.log('✅ Tabla users creada exitosamente');
+  } catch (error) {
+    console.error('❌ Error al crear la tabla users:', error);
+    throw error;
+  }
+}
+
+async function insertTestUsers() {
+  try {
+    console.log('👤 Insertando usuarios de prueba...');
+    
+    const bcrypt = require('bcrypt');
+    const saltRounds = 10;
+    
+    const testUsers = [
+      {
+        username: 'admin',
+        email: 'admin@example.com',
+        password: 'admin123',
+        role: 'admin'
+      },
+      {
+        username: 'usuario',
+        email: 'usuario@example.com',
+        password: 'usuario123',
+        role: 'user'
+      }
+    ];
+
+    for (const user of testUsers) {
+      const passwordHash = await bcrypt.hash(user.password, saltRounds);
+      
+      await db.query(
+        'INSERT INTO users (username, email, password_hash, role) VALUES ($1, $2, $3, $4)',
+        [user.username, user.email, passwordHash, user.role]
+      );
+    }
+    
+    console.log(`✅ ${testUsers.length} usuarios de prueba insertados`);
+    return testUsers.length;
+  } catch (error) {
+    console.error('❌ Error insertando usuarios de prueba:', error);
+    throw error;
+  }
+}
+
 export async function GET() {
   console.log('🔄 Iniciando reinicio completo de la base de datos...');
   
@@ -112,12 +198,14 @@ export async function GET() {
     // Paso 1: Limpiar base de datos
     await resetDatabase();
     
-    // Paso 2: Crear tabla
-    console.log('🔧 Creando tabla projects...');
+    // Paso 2: Crear tablas
+    console.log('🔧 Creando tablas...');
     await createProjectsTable();
+    await createUsersTable();
     
     // Paso 3: Insertar datos de prueba
-    const insertedCount = await insertTestData();
+    const insertedProjectsCount = await insertTestData();
+    const insertedUsersCount = await insertTestUsers();
     
     console.log('🎉 Base de datos reiniciada exitosamente');
     
@@ -125,9 +213,10 @@ export async function GET() {
       success: true,
       message: 'Base de datos reiniciada y configurada correctamente',
       actions: [
-        'Tabla projects eliminada',
-        'Tabla projects creada con triggers',
-        `${insertedCount} proyectos de prueba insertados`
+        'Tablas eliminadas',
+        'Tablas creadas con triggers',
+        `${insertedProjectsCount} proyectos de prueba insertados`,
+        `${insertedUsersCount} usuarios de prueba insertados`
       ],
       timestamp: new Date().toISOString()
     });

@@ -1,5 +1,10 @@
 import { ProjectDetail } from '@/components/project-detail/project-detail';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 export default function ProjectPage() {
-  return <ProjectDetail />;
+  return (
+    <ProtectedRoute>
+      <ProjectDetail />
+    </ProtectedRoute>
+  );
 }

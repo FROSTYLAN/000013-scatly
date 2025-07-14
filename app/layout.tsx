@@ -81,6 +81,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { AuthProvider } from '@/lib/hooks/use-auth';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -90,7 +92,9 @@ export default function RootLayout({
     <html className='dark' lang='en'>
       <head />
       <body className={`${firaCode.className} ${firaCode.variable}`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

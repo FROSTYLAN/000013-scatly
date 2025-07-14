@@ -51,6 +51,7 @@ export function ContactForm() {
           from_email: values.email,
           message: values.message,
         }),
+        credentials: 'include'
       });
 
       if (!response.ok) {

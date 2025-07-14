@@ -27,9 +27,34 @@ export default function ProjectsSection() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/projects');
+        debugger
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        console.log('🔍 ProjectsSection - Token desde localStorage:', token ? token.substring(0, 20) + '...' : 'NO ENCONTRADO');
+        
+        if (!token) {
+          console.log('No hay token, mostrando mensaje de login');
+          setError('Inicia sesión para ver tus proyectos');
+          setLoading(false);
+          return;
+        }
+        
+        console.log('📤 ProjectsSection - Enviando petición con Authorization header:', `Bearer ${token.substring(0, 20)}...`);
+        const response = await fetch('/api/projects', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log('📥 ProjectsSection - Respuesta recibida, status:', response.status);
         
         if (!response.ok) {
+          if (response.status === 401) {
+            console.log('Token inválido, limpiando localStorage');
+            localStorage.removeItem('auth_token');
+            setError('Tu sesión ha expirado. Inicia sesión nuevamente.');
+            setLoading(false);
+            return;
+          }
           throw new Error(`Error: ${response.status}`);
         }
         
@@ -104,11 +129,19 @@ export default function ProjectsSection() {
         
         {/* Mostramos un mensaje de error si ocurre algún problema */}
         {error && (
-          <div className="text-center p-4 text-red-500 w-full">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="text-center p-4 w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto mb-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p>{error}</p>
+            <p className="text-gray-300 mb-4">{error}</p>
+            {(error.includes('Inicia sesión') || error.includes('sesión ha expirado')) && (
+              <button 
+                onClick={() => window.location.href = '/login'}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+              >
+                Iniciar Sesión
+              </button>
+            )}
           </div>
         )}
         

@@ -80,9 +80,28 @@ export const useProjectForm = () => {
     const fetchProjectData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/projects/${projectId}`);
+        
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          console.log('No hay token, redirigiendo al login');
+          window.location.href = '/login';
+          return;
+        }
+        
+        const response = await fetch(`/api/projects/${projectId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
         if (!response.ok) {
+          if (response.status === 401) {
+            console.log('Token inválido, redirigiendo al login');
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login';
+            return;
+          }
           throw new Error(`Error: ${response.status}`);
         }
         
@@ -303,6 +322,7 @@ export const useProjectForm = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(projectData),
+        credentials: 'include' // Incluir cookies en la solicitud
       });
       
       if (!response.ok) {
