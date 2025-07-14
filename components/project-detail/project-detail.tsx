@@ -10,7 +10,7 @@ import { useNavStore } from '@/store/use-nav-store';
 export function ProjectDetail() {
   const params = useParams();
   const router = useRouter();
-  const { addNavItem } = useNavStore();
+  const { addNavItem, setActiveNavId, setActivePath } = useNavStore();
   const projectId = params?.id ? Number(params.id) : null;
   
   const [project, setProject] = useState<Project | null>(null);
@@ -182,11 +182,13 @@ export function ProjectDetail() {
                   onClick={() => {
                     // Navegar a la página de edición del proyecto
                     // Añadir el proyecto al store de navegación antes de navegar
-                    addNavItem({
+                    const newId = addNavItem({
                       name: project.nombre,
                       id: projectId,
-                      // No marcamos como existente porque queremos ir a la ruta de edición
+                      isExisting: false // Marcamos como false para que use la ruta /new/
                     });
+                    // Actualizar manualmente la ruta activa
+                    setActivePath(`/new/${projectId}`);
                     router.push(`/new/${projectId}`);
                   }}
                 >

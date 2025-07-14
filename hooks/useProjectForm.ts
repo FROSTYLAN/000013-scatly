@@ -10,25 +10,74 @@ export const useProjectForm = () => {
   
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<ProjectData>(() => {
-    // Para proyectos nuevos, inicializar con un objeto vacío sin acciones correctivas ni categorías NAC
-    if (!params?.id || Number(params.id) <= 1) {
-      return {
+    // Verificar si estamos en la ruta /new/[id] o /project/[id]
+    const isNewRoute = typeof window !== 'undefined' && window.location.pathname.includes('/new/');
+    
+    // Para proyectos nuevos en la ruta /new/1
+    if (isNewRoute && (!params?.id || Number(params.id) === 1)) {
+      // Intentar cargar un proyecto vacío desde localStorage
+      if (typeof window !== 'undefined') {
+        const emptyProject = localStorage.getItem('empty_project');
+        if (emptyProject) {
+          try {
+            const parsedProject = JSON.parse(emptyProject);
+            console.log('Proyecto vacío recuperado de localStorage:', parsedProject);
+            return parsedProject;
+          } catch (e) {
+            console.error('Error al parsear proyecto vacío de localStorage:', e);
+          }
+        }
+        
+        // Si no existe un proyecto vacío en localStorage, crear uno nuevo y guardarlo
+        const newEmptyProject = {
+          ...projectEmpty,
+          correctiveActions: [],
+          nacCategories: []
+        };
+        localStorage.setItem('empty_project', JSON.stringify(newEmptyProject));
+        return newEmptyProject;
+      }
+    }
+    
+    // Para proyectos nuevos en proceso de creación (ruta /new/[id] con ID negativo o > 1)
+    // intentar recuperar del localStorage
+    if (isNewRoute && typeof window !== 'undefined' && projectId && (projectId > 1 || projectId < 0)) {
+      const savedProject = localStorage.getItem(`draft_project_${projectId}`);
+      if (savedProject) {
+        try {
+          const parsedProject = JSON.parse(savedProject);
+          console.log('Proyecto recuperado de localStorage:', parsedProject);
+          return parsedProject;
+        } catch (e) {
+          console.error('Error al parsear proyecto de localStorage:', e);
+        }
+      }
+      
+      // Si no existe un borrador para este ID, crear uno nuevo
+      const newDraftProject = {
         ...projectEmpty,
         correctiveActions: [],
         nacCategories: []
       };
+      localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(newDraftProject));
+      return newDraftProject;
     }
-    // Para proyectos existentes, usar projectEmpty completo
+    
+    // Para proyectos existentes o fallback para SSR, usar projectEmpty completo
     return projectEmpty;
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar datos del proyecto si existe un ID
+  // Cargar datos del proyecto si existe un ID y estamos en la ruta /project/[id]
   useEffect(() => {
+    // Verificar si estamos en la ruta /project/[id] o /new/[id]
+    const isProjectRoute = window.location.pathname.includes('/project/');
+    
+    // Solo cargar datos de la API si estamos en la ruta /project/[id] y el ID es válido
+    if (!isProjectRoute || !projectId || projectId <= 1) return;
+    
     const fetchProjectData = async () => {
-      if (!projectId || projectId <= 1) return; // No cargar para nuevos proyectos o la página principal
-      
       try {
         setLoading(true);
         const response = await fetch(`/api/projects/${projectId}`);
@@ -70,6 +119,28 @@ export const useProjectForm = () => {
     
     fetchProjectData();
   }, [projectId]);
+  
+  // Guardar datos del formulario en localStorage cuando cambian
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Verificar si estamos en la ruta /new/[id] o /project/[id]
+      const isNewRoute = window.location.pathname.includes('/new/');
+      
+      // Solo guardar en localStorage si estamos en la ruta /new/[id]
+      if (isNewRoute) {
+        // Para proyectos nuevos en la ruta /new/1
+        if (!projectId || projectId === 1) {
+          localStorage.setItem('empty_project', JSON.stringify(formData));
+          console.log('Proyecto vacío actualizado en localStorage');
+        }
+        // Para proyectos nuevos en proceso de creación (ID > 1 o ID negativo)
+        else if (projectId > 1 || projectId < 0) {
+          localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(formData));
+          console.log('Proyecto guardado en localStorage:', projectId);
+        }
+      }
+    }
+  }, [formData, projectId]);
 
   const updateFormData = (field: keyof ProjectData, value: any) => {
     setFormData(prev => ({
@@ -205,6 +276,9 @@ export const useProjectForm = () => {
     try {
       setLoading(true);
       
+      // Verificar si estamos en la ruta /new/[id] o /project/[id]
+      const isNewRoute = typeof window !== 'undefined' && window.location.pathname.includes('/new/');
+      
       // Preparar los datos para enviar a la API
       const projectData = {
         nombre: formData.name,
@@ -215,11 +289,13 @@ export const useProjectForm = () => {
       };
       
       // Determinar si es una creación o actualización
-      const url = projectId && projectId > 1 
+      // Si estamos en la ruta /new/[id], siempre es una creación (POST)
+      // Si estamos en la ruta /project/[id], siempre es una actualización (PUT)
+      const url = !isNewRoute && projectId && projectId > 0 
         ? `/api/projects/${projectId}` 
         : '/api/projects';
       
-      const method = projectId && projectId > 1 ? 'PUT' : 'POST';
+      const method = !isNewRoute && projectId && projectId > 0 ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
         method,
@@ -235,6 +311,26 @@ export const useProjectForm = () => {
       
       const data = await response.json();
       console.log('Proyecto guardado:', data);
+      
+      if (typeof window !== 'undefined') {
+        if (isNewRoute) {
+          // Si estamos en la ruta /new/[id]
+          if (!projectId || projectId === 1) {
+            // Si es el proyecto vacío (ID = 1), reiniciarlo
+            const emptyProject = {
+              ...projectEmpty,
+              correctiveActions: [],
+              nacCategories: []
+            };
+            localStorage.setItem('empty_project', JSON.stringify(emptyProject));
+            console.log('Proyecto vacío reiniciado en localStorage');
+          } else if (projectId > 1 || projectId < 0) {
+            // Si es un proyecto en proceso (ID > 1 o ID negativo), eliminar el borrador
+            localStorage.removeItem(`draft_project_${projectId}`);
+            console.log('Borrador eliminado de localStorage:', projectId);
+          }
+        }
+      }
       
       return { success: true, data };
     } catch (err) {

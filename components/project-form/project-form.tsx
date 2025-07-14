@@ -11,12 +11,20 @@ import { Step7CorrectiveActions } from './step-7-corrective-actions';
 import { FormNavigation } from './form-navigation';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function ProjectForm() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isNewProject, setIsNewProject] = useState(false);
+  
+  // Determinar si estamos en la ruta /new/[id]
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsNewProject(window.location.pathname.includes('/new/'));
+    }
+  }, []);
   
   const {
     step,
@@ -164,8 +172,13 @@ export function ProjectForm() {
                   const result = await saveProject();
                   
                   if (result.success) {
-                    // Redirigir a la página principal después de guardar
-                    router.push('/');
+                    if (isNewProject) {
+                      // Si estamos en /new/[id], redirigir a la página principal
+                      router.push('/');
+                    } else {
+                      // Si estamos en /project/[id], redirigir a la página del proyecto
+                      router.push(`/project/${result.data.id || 1}`);
+                    }
                   } else {
                     setSaveError('Error al guardar el proyecto. Por favor, inténtalo de nuevo.');
                   }

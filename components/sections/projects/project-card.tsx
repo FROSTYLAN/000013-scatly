@@ -14,20 +14,47 @@ type props = {
 
 export default function ProjectCard({ project }: props) {
   const router = useRouter();
-  const { addNavItem } = useNavStore();
+  const { addNavItem, setActiveNavId, setActivePath } = useNavStore();
 
   const handleAddProject = (item: any) => {
-    // Si es un nuevo proyecto, usamos el ID generado por el store
     if (project.id === 0) {
+      // Es un nuevo proyecto
+      // Limpiar localStorage para asegurar que se inicie con un proyecto vacío
+      if (typeof window !== 'undefined') {
+        // Reiniciar el proyecto vacío en localStorage
+        const emptyProjectStr = localStorage.getItem('empty_project');
+        if (emptyProjectStr) {
+          try {
+            // Obtener el proyecto vacío actual
+            const emptyProject = JSON.parse(emptyProjectStr);
+            // Reiniciar los arrays
+            emptyProject.correctiveActions = [];
+            emptyProject.nacCategories = [];
+            // Guardar el proyecto vacío reiniciado
+            localStorage.setItem('empty_project', JSON.stringify(emptyProject));
+          } catch (e) {
+            console.error('Error al reiniciar proyecto vacío:', e);
+          }
+        }
+      }
+      
+      // Añadir el nuevo proyecto (addNavItem generará un ID negativo)
       const newId = addNavItem(item);
-      router.push(`/new/${newId}`);
+      // Actualizar manualmente la ruta activa
+      setActiveNavId(newId);
+      setActivePath(`/new/${Math.abs(newId)}`);
+      // Usar el valor absoluto del ID para la ruta
+      router.push(`/new/${Math.abs(newId)}`);
     } else {
       // Si es un proyecto existente, usamos su ID real y marcamos que es existente
-      addNavItem({
+      const newId = addNavItem({
         ...item,
         id: project.id,
         isExisting: true
       });
+      // Actualizar manualmente la ruta activa
+      setActiveNavId(project.id);
+      setActivePath(`/project/${project.id}`);
       router.push(`/project/${project.id}`);
     }
   };

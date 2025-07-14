@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const router = useRouter();
-  const { activeNavId, setActiveNavId, navItems, removeNavItem } = useNavStore();
+  const { activeNavId, activePath, setActiveNavId, setActivePath, navItems, removeNavItem } = useNavStore();
 
   const handleClose = (e: React.MouseEvent, item: any) => {
     e.preventDefault();
@@ -19,6 +19,7 @@ export default function Header() {
     }
     removeNavItem(item);
     setActiveNavId(1);
+    setActivePath('/');
     router.replace('/');
   };
   return (
@@ -28,13 +29,16 @@ export default function Header() {
       </div>
       <div className='flex items-center size-full'>
         {navItems.map((item) => {
-          const isActive = item.id === activeNavId;
+          const isActive = item.id === activeNavId && item.path === activePath;
           return (
             <Link
               key={item.id}
               href={item.path}
               scroll
-              onClick={() => setActiveNavId(item.id)}
+              onClick={() => {
+                setActiveNavId(item.id);
+                setActivePath(item.path);
+              }}
               className={cn(
                 'relative h-full w-fit md:min-w-40 border-x flex items-center justify-start gap-2 text-muted-foreground hover:bg-background px-4',
                 isActive && 'text-foreground bg-background'
@@ -45,7 +49,11 @@ export default function Header() {
 
               {item.id !== 1 &&
                 <button
-                  onClick={(e) => handleClose(e, item)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClose(e, item);
+                  }}
                   className="absolute top-3 right-2 rounded-full hover:bg-red-100 transition-colors"
                 >
                   <svg
