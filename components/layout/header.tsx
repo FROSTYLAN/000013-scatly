@@ -1,8 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import Image from 'next/image';
-import logo from '@/public/imgs/logo.webp';
 import { useNavStore } from '@/store/use-nav-store';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/hooks/use-auth';
