@@ -67,11 +67,11 @@ export function Step7CorrectiveActions({
         ))}
       </div>
       <div className="p-4 rounded-lg border border-amber-200 bg-amber-100/10">
-        <h4 className="font-medium mb-2">Leyenda:</h4>
+        <h4 className="font-medium mb-2">P-E-C LEYENDA:</h4>
         <div className="space-y-1 text-sm">
-          <p>P = Pendiente</p>
-          <p>E = En proceso</p>
-          <p>C = Completado</p>
+          <p><strong>P</strong> = ¿Tenemos estándares de programa para esta actividad?</p>
+          <p><strong>E</strong> = ¿Son adecuados los estándares existentes?</p>
+          <p><strong>C</strong> = ¿Hay un cumplimiento total de los estándares?</p>
         </div>
       </div>
     </div>
