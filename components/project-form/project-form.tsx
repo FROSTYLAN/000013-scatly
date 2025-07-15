@@ -41,6 +41,7 @@ export function ProjectForm() {
     removeNACField,
     getNACFieldComment,
     isNACFieldSelected,
+    cleanAllLocalStorageData,
     nextStep,
     prevStep,
     saveProject
@@ -52,14 +53,20 @@ export function ProjectForm() {
         return (
           <Step1ProjectData
             formData={formData}
-            updateFormData={updateFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 2:
         return (
           <Step2PersonData
             formData={formData}
-            updateNestedFormData={updateNestedFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 3:
@@ -154,12 +161,14 @@ export function ProjectForm() {
     <div className="max-w-5xl mx-auto flex flex-col min-h-screen">
       <div className="sticky top-0 z-10 bg-background border-b">
         <div className="max-w-4xl mx-auto py-6">
-          <FormNavigation
-            step={step}
-            prevStep={prevStep}
-            nextStep={nextStep}
-            showButtons={false}
-          />
+          <div className="flex justify-between items-center">
+            <FormNavigation
+              step={step}
+              prevStep={prevStep}
+              nextStep={nextStep}
+              showButtons={false}
+            />
+          </div>
         </div>
       </div>
       <div className="flex-1 overflow-auto">
@@ -168,7 +177,7 @@ export function ProjectForm() {
         </div>
       </div>
       <div className="sticky bottom-0 z-10 bg-background border-t shadow-[0_-1px_3px_0_rgb(0,0,0,0.1)]">
-        <div className="max-w-4xl mx-auto py-4 px-4 flex justify-between">
+        <div className="max-w-4xl mx-auto py-4 px-4 flex justify-between items-center">
           <Button
             type="button"
             variant="outline"
@@ -179,6 +188,23 @@ export function ProjectForm() {
           >
             Anterior
           </Button>
+
+          {/* Debug button for cleaning localStorage */}
+          {isNewProject && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                cleanAllLocalStorageData();
+                window.location.reload();
+              }}
+              className="text-xs text-gray-500 hover:text-gray-700"
+              title="Limpiar datos del localStorage"
+            >
+              🧹 Limpiar datos
+            </Button>
+          )}
 
           <Button
             type="button"

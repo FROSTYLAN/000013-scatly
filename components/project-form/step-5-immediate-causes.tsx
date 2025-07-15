@@ -1,4 +1,4 @@
-import { ProjectData } from '@/types/form-types';
+import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
@@ -13,12 +13,12 @@ interface FieldData {
   children: FieldData[];
 }
 
-interface Step5Props {
+interface Step5ImmediateCausesProps {
   formData: ProjectData;
-  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
-  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
-  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
-  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
+  updateStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => boolean;
 }
 
 export function Step5ImmediateCauses({ 
@@ -27,7 +27,7 @@ export function Step5ImmediateCauses({
   removeStepField, 
   getStepFieldComment, 
   isStepFieldSelected 
-}: Step5Props) {
+}: Step5ImmediateCausesProps) {
   const [fieldsData, setFieldsData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

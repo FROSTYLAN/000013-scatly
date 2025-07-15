@@ -1,4 +1,4 @@
-import { ProjectData } from '@/types/form-types';
+import { ProjectData } from '@/types/project';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,7 +7,10 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Step1Props {
   formData: ProjectData;
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => boolean;
 }
 
 interface FieldData {
@@ -19,7 +22,7 @@ interface FieldData {
   children: FieldData[];
 }
 
-export function Step1ProjectData({ formData, updateFormData }: Step1Props) {
+export function Step1ProjectData({ formData, updateStepField, removeStepField, getStepFieldComment, isStepFieldSelected }: Step1Props) {
   const [fieldData, setFieldData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,22 +81,12 @@ export function Step1ProjectData({ formData, updateFormData }: Step1Props) {
   }, []);
 
   const renderField = (field: FieldData) => {
-    const fieldKey = field.code.toLowerCase().replace('s1_', '') as keyof ProjectData;
-    
-    // Mapear códigos de campo a propiedades del formulario
-    const getFormField = (code: string) => {
-      switch (code) {
-        case 'S1_1': return 'name';
-        case 'S1_2': return 'description';
-        case 'S1_3': return 'date';
-        default: return null;
-      }
+    const comment = getStepFieldComment('step1Fields', field.id);
+    const isSelected = isStepFieldSelected('step1Fields', field.id);
+
+    const handleChange = (value: string) => {
+      updateStepField('step1Fields', field.id, value);
     };
-
-    const formField = getFormField(field.code);
-    if (!formField) return null;
-
-    const value = formData[formField as keyof ProjectData] || '';
 
     return (
       <div key={field.id} className="space-y-2">
@@ -101,8 +94,8 @@ export function Step1ProjectData({ formData, updateFormData }: Step1Props) {
         {field.code === 'S1_2' ? (
           <Textarea
             id={field.code}
-            value={value as string}
-            onChange={(e) => updateFormData(formField as keyof ProjectData, e.target.value)}
+            value={comment}
+            onChange={(e) => handleChange(e.target.value)}
             placeholder={`Ingrese ${field.name.toLowerCase()}`}
             rows={4}
           />
@@ -110,8 +103,8 @@ export function Step1ProjectData({ formData, updateFormData }: Step1Props) {
           <Input
             id={field.code}
             type={field.code === 'S1_3' ? 'date' : 'text'}
-            value={value as string}
-            onChange={(e) => updateFormData(formField as keyof ProjectData, e.target.value)}
+            value={comment}
+            onChange={(e) => handleChange(e.target.value)}
             placeholder={field.code === 'S1_3' ? '' : `Ingrese ${field.name.toLowerCase()}`}
           />
         )}

@@ -2,13 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ProjectData, projectEmpty } from '@/types/form-types';
+import { ProjectData, projectEmpty } from '@/types/project';
 
 export const useProjectForm = () => {
   const params = useParams();
   const projectId = params?.id ? Number(params.id) : null;
   
   const [step, setStep] = useState(1);
+  // Función para limpiar datos y mantener solo los stepFields
+  const cleanProjectData = (data: ProjectData): any => {
+    return {
+      // Mantener solo los stepFields que contienen los datos reales
+      step1Fields: data.step1Fields || [],
+      step2Fields: data.step2Fields || [],
+      step3Fields: data.step3Fields || [],
+      step4Fields: data.step4Fields || [],
+      step5Fields: data.step5Fields || [],
+      step6Fields: data.step6Fields || [],
+      step7Fields: data.step7Fields || []
+    };
+  };
+
   const [formData, setFormData] = useState<ProjectData>(() => {
     // Verificar si estamos en la ruta /new/[id] o /project/[id]
     const isNewRoute = typeof window !== 'undefined' && window.location.pathname.includes('/new/');
@@ -22,17 +36,21 @@ export const useProjectForm = () => {
           try {
             const parsedProject = JSON.parse(emptyProject);
             console.log('Proyecto vacío recuperado de localStorage:', parsedProject);
-            return parsedProject;
+            // Limpiar los datos al cargar
+            const cleanedProject = cleanProjectData(parsedProject);
+            // Guardar la versión limpia de vuelta al localStorage
+            localStorage.setItem('empty_project', JSON.stringify(cleanedProject));
+            return cleanedProject;
           } catch (e) {
             console.error('Error al parsear proyecto vacío de localStorage:', e);
           }
         }
         
         // Si no existe un proyecto vacío en localStorage, crear uno nuevo y guardarlo
-        const newEmptyProject = {
+        const newEmptyProject = cleanProjectData({
           ...projectEmpty,
           nacCategories: []
-        };
+        });
         localStorage.setItem('empty_project', JSON.stringify(newEmptyProject));
         return newEmptyProject;
       }
@@ -46,17 +64,21 @@ export const useProjectForm = () => {
         try {
           const parsedProject = JSON.parse(savedProject);
           console.log('Proyecto recuperado de localStorage:', parsedProject);
-          return parsedProject;
+          // Limpiar los datos al cargar
+          const cleanedProject = cleanProjectData(parsedProject);
+          // Guardar la versión limpia de vuelta al localStorage
+          localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(cleanedProject));
+          return cleanedProject;
         } catch (e) {
           console.error('Error al parsear proyecto de localStorage:', e);
         }
       }
       
       // Si no existe un borrador para este ID, crear uno nuevo
-      const newDraftProject = {
+      const newDraftProject = cleanProjectData({
         ...projectEmpty,
         nacCategories: []
-      };
+      });
       localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(newDraftProject));
       return newDraftProject;
     }
@@ -145,15 +167,18 @@ export const useProjectForm = () => {
       
       // Solo guardar en localStorage si estamos en la ruta /new/[id]
       if (isNewRoute) {
+        // Limpiar los datos antes de guardar
+        const cleanedData = cleanProjectData(formData);
+        
         // Para proyectos nuevos en la ruta /new/1
         if (!projectId || projectId === 1) {
-          localStorage.setItem('empty_project', JSON.stringify(formData));
-          console.log('Proyecto vacío actualizado en localStorage');
+          localStorage.setItem('empty_project', JSON.stringify(cleanedData));
+          console.log('Proyecto vacío actualizado en localStorage (limpio):', cleanedData);
         }
         // Para proyectos nuevos en proceso de creación (ID > 1 o ID negativo)
         else if (projectId > 1 || projectId < 0) {
-          localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(formData));
-          console.log('Proyecto guardado en localStorage:', projectId);
+          localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(cleanedData));
+          console.log('Proyecto guardado en localStorage (limpio):', projectId, cleanedData);
         }
       }
     }
@@ -197,7 +222,7 @@ export const useProjectForm = () => {
   };
 
   // Funciones para manejar campos simplificados con fieldId y comment
-  const updateStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => {
+  const updateStepField = (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => {
     const currentFields = formData[step] || [];
     const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
     
@@ -212,19 +237,19 @@ export const useProjectForm = () => {
     }
   };
 
-  const removeStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => {
+  const removeStepField = (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => {
     const currentFields = formData[step] || [];
     const newFields = currentFields.filter(field => field.fieldId !== fieldId);
     updateFormData(step, newFields);
   };
 
-  const getStepFieldComment = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): string => {
+  const getStepFieldComment = (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): string => {
     const currentFields = formData[step] || [];
     const field = currentFields.find(field => field.fieldId === fieldId);
     return field?.comment || '';
   };
 
-  const isStepFieldSelected = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): boolean => {
+  const isStepFieldSelected = (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): boolean => {
     const currentFields = formData[step] || [];
     return currentFields.some(field => field.fieldId === fieldId);
   };
@@ -343,6 +368,44 @@ export const useProjectForm = () => {
     }
   };
 
+  // Función para limpiar manualmente el localStorage
+  const cleanAllLocalStorageData = () => {
+    if (typeof window !== 'undefined') {
+      // Limpiar proyecto vacío
+      const emptyProject = localStorage.getItem('empty_project');
+      if (emptyProject) {
+        try {
+          const parsedProject = JSON.parse(emptyProject);
+          const cleanedProject = cleanProjectData(parsedProject);
+          localStorage.setItem('empty_project', JSON.stringify(cleanedProject));
+          console.log('Proyecto vacío limpiado en localStorage');
+        } catch (e) {
+          console.error('Error al limpiar proyecto vacío:', e);
+        }
+      }
+      
+      // Limpiar todos los borradores de proyectos
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('draft_project_')) {
+          try {
+            const projectData = localStorage.getItem(key);
+            if (projectData) {
+              const parsedProject = JSON.parse(projectData);
+              const cleanedProject = cleanProjectData(parsedProject);
+              localStorage.setItem(key, JSON.stringify(cleanedProject));
+              console.log(`Proyecto ${key} limpiado en localStorage`);
+            }
+          } catch (e) {
+            console.error(`Error al limpiar ${key}:`, e);
+          }
+        }
+      });
+      
+      console.log('Limpieza completa de localStorage finalizada');
+    }
+  };
+
   return {
     step,
     formData,
@@ -364,6 +427,8 @@ export const useProjectForm = () => {
     isNACFieldSelected,
     // Función legacy
     updateNACComment,
+    // Función de limpieza
+    cleanAllLocalStorageData,
     nextStep,
     prevStep,
     saveProject

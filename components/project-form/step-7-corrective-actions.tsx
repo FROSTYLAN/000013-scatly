@@ -1,6 +1,6 @@
 'use client';
 
-import { ProjectData } from '@/types/form-types';
+import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 

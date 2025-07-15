@@ -47,6 +47,11 @@ export type NACCategory = {
   }[];
 }
 
+export type StepField = {
+  fieldId: number;
+  comment: string;
+};
+
 export type ProjectData = {
   // Paso 1: Datos del Proyecto
   name: string;
@@ -81,6 +86,15 @@ export type ProjectData = {
 
   // Paso 7: Necesidades de Acción Correctiva (NAC)
   nacCategories: NACCategory[];
+
+  // New unified step fields structure
+  step1Fields: StepField[];
+  step2Fields: StepField[];
+  step3Fields: StepField[];
+  step4Fields: StepField[];
+  step5Fields: StepField[];
+  step6Fields: StepField[];
+  step7Fields: StepField[];
 }
 
 export const projectEmpty: ProjectData = {
@@ -113,6 +127,13 @@ export const projectEmpty: ProjectData = {
   immediateConditionsUnsafe: [],
   basicFactorsPersonal: [],
   basicFactorsWork: [],
+  step1Fields: [],
+  step2Fields: [],
+  step3Fields: [],
+  step4Fields: [],
+  step5Fields: [],
+  step6Fields: [],
+  step7Fields: [],
   nacCategories: [
     {
       category: 'LIDERAZGO Y ADMINISTRACIÓN',

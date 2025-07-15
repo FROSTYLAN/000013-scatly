@@ -1,13 +1,13 @@
-import { ProjectData } from '@/types/form-types';
+import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Step3PotentialEvaluationProps {
   formData: ProjectData;
-  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
-  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
-  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
-  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
+  updateStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => boolean;
 }
 
 interface FieldData {
@@ -92,7 +92,7 @@ export function Step3PotentialEvaluation({
 
   // Función para obtener el fieldId seleccionado en una sección
   const getSelectedFieldId = (sectionId: number): number | null => {
-    const selectedField = formData.step3Fields?.find(field => {
+    const selectedField = formData.step3Fields.find(field => {
       // Buscar en los children de la sección para ver cuál está seleccionado
       const section = evaluationData?.children.find(s => s.id === sectionId);
       return section?.children.some(child => child.id === field.fieldId);
