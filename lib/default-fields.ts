@@ -290,7 +290,7 @@ export const DEFAULT_FIELDS = [
     { parent_code: 'S6_C1_4', code: 'S6_C1_4_9', name: 'Preocupación por problemas', has_comment: true },
     { parent_code: 'S6_C1_4', code: 'S6_C1_4_10', name: 'Frustración', has_comment: true },
     { parent_code: 'S6_C1_4', code: 'S6_C1_4_11', name: 'Enfermedad Mental', has_comment: true },
-    { parent_code: 'S6_C1_3', code: 'S6_C1_3_12', name: 'Otro estrés mental', has_comment: true },
+    { parent_code: 'S6_C1_4', code: 'S6_C1_4_12', name: 'Otro estrés mental', has_comment: true },
 
   { parent_code: 'S6_C1', code: 'S6_C1_5', name: 'Falta de conocimientos', has_comment: true },
     { parent_code: 'S6_C1_5', code: 'S6_C1_5_1', name: 'Falta de experiencia', has_comment: true },
