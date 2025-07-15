@@ -388,7 +388,6 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
                     />
                     <div className="space-y-2 flex-1">
                       <div className="text-sm font-medium">{factor.name}</div>
-                      <div className="text-xs text-gray-500">{factor.code}</div>
                     </div>
                   </label>
                   {isSelected && currentItem && (
@@ -452,7 +451,6 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
                     />
                     <div className="space-y-2 flex-1">
                       <div className="text-sm font-medium">{factor.name}</div>
-                      <div className="text-xs text-gray-500">{factor.code}</div>
                     </div>
                   </label>
                   {isSelected && currentItem && (

@@ -17,12 +17,14 @@ interface Step7Props {
   formData: ProjectData;
   updateNACStatus: (categoryIndex: number, subcategoryIndex: number, status: 'P' | 'E' | 'C' | '') => void;
   updateNACComment: (categoryIndex: number, subcategoryIndex: number, comment: string) => void;
+  updateFormData: (field: keyof ProjectData, value: any) => void;
 }
 
 export function Step7CorrectiveActions({ 
   formData, 
   updateNACStatus,
-  updateNACComment
+  updateNACComment,
+  updateFormData
 }: Step7Props) {
   const [nacCategories, setNacCategories] = useState<FieldData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,7 @@ export function Step7CorrectiveActions({
         const data = await response.json();
         
         if (data.success && data.data) {
+          console.log('Datos de la API:', data.data);
           const sortedCategories = (data.data.children || []).sort((a: any, b: any) => {
             const numA = getLastNumber(a.code);
             const numB = getLastNumber(b.code);
@@ -71,7 +74,47 @@ export function Step7CorrectiveActions({
             })
           }));
           
+          console.log('Categorías de la API:', sortedCategories.map((cat: any) => cat.name));
           setNacCategories(sortedCategories);
+          
+          // Sincronizar formData.nacCategories con las categorías de la API
+          const updatedNACCategories = sortedCategories.map((apiCategory: any) => {
+            // Buscar si ya existe esta categoría en formData
+            const existingCategory = formData.nacCategories.find(cat => 
+              cat.category === apiCategory.name || cat.category.includes(apiCategory.name)
+            );
+            
+            if (existingCategory) {
+              // Si existe, mantener los datos existentes pero actualizar subcategorías si es necesario
+              return {
+                category: apiCategory.name,
+                subcategories: apiCategory.children.map((apiSub: any) => {
+                  const existingSub = existingCategory.subcategories.find(sub => sub.code === apiSub.code);
+                  return existingSub || {
+                    code: apiSub.code,
+                    description: apiSub.name,
+                    status: '' as const,
+                    comment: ''
+                  };
+                })
+              };
+            } else {
+              // Si no existe, crear nueva categoría
+              return {
+                category: apiCategory.name,
+                subcategories: apiCategory.children.map((apiSub: any) => ({
+                  code: apiSub.code,
+                  description: apiSub.name,
+                  status: '' as const,
+                  comment: ''
+                }))
+              };
+            }
+          });
+          
+          // Actualizar formData con las categorías sincronizadas
+          updateFormData('nacCategories', updatedNACCategories);
+          
           setError(null);
         } else {
           setError('Failed to load NAC categories');
@@ -97,16 +140,23 @@ export function Step7CorrectiveActions({
   }
 
   // Helper function to find category and subcategory indices in formData
-  const findFormDataIndices = (categoryCode: string, subcategoryCode: string) => {
+  const findFormDataIndices = (categoryName: string, subcategoryCode: string) => {
+    console.log('Buscando categoría:', categoryName);
+    console.log('Categorías disponibles en formData:', formData.nacCategories.map(cat => cat.category));
+    
     const categoryIndex = formData.nacCategories.findIndex(cat => 
-      cat.category.includes(categoryCode) || cat.category === categoryCode
+      cat.category.includes(categoryName) || cat.category === categoryName
     );
+    
+    console.log('Índice de categoría encontrado:', categoryIndex);
     
     if (categoryIndex === -1) return { categoryIndex: -1, subcategoryIndex: -1 };
     
     const subcategoryIndex = formData.nacCategories[categoryIndex].subcategories.findIndex(sub => 
       sub.code === subcategoryCode
     );
+    
+    console.log('Índice de subcategoría encontrado:', subcategoryIndex);
     
     return { categoryIndex, subcategoryIndex };
   };
@@ -140,12 +190,11 @@ export function Step7CorrectiveActions({
           return (
             <div key={`category-${apiCategoryIndex}`} className="space-y-4">
               <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
-              <div className="text-xs text-gray-500 text-center">{category.code}</div>
               
               <div className="grid gap-2">
                 {category.children.map((subcategory, apiSubcategoryIndex) => {
                   // Find corresponding subcategory in formData
-                  const { categoryIndex, subcategoryIndex } = findFormDataIndices(category.code, subcategory.code);
+                  const { categoryIndex, subcategoryIndex } = findFormDataIndices(category.name, subcategory.code);
                   
                   const formSubcategory = categoryIndex >= 0 && subcategoryIndex >= 0 
                     ? formData.nacCategories[categoryIndex].subcategories[subcategoryIndex]
@@ -155,7 +204,6 @@ export function Step7CorrectiveActions({
                     <div key={`subcategory-${apiCategoryIndex}-${apiSubcategoryIndex}`} 
                          className="space-y-2">
                       <div className="flex items-center gap-4 p-3 hover:bg-amber-100/10 rounded-lg transition-colors duration-200">
-                        <span className="min-w-[60px] text-sm font-medium">{subcategory.code}</span>
                         <span className="flex-1 text-sm">{subcategory.name}</span>
                         <div className="flex gap-2">
                           <button

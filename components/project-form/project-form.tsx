@@ -88,6 +88,7 @@ export function ProjectForm() {
         return (
           <Step7CorrectiveActions
             formData={formData}
+            updateFormData={updateFormData}
             updateNACStatus={updateNACStatus}
             updateNACComment={updateNACComment}
           />
