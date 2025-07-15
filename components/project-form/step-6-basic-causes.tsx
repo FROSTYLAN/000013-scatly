@@ -31,6 +31,7 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
   const [personalFactors, setPersonalFactors] = useState<ApiBasicCause[]>([]);
   const [workFactors, setWorkFactors] = useState<ApiBasicCause[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getLastNumber = (code: string): number => {
     const match = code.match(/(\d+)$/);
@@ -40,7 +41,18 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
   useEffect(() => {
     const fetchFields = async () => {
       try {
-        const response = await fetch('/api/fields/STEP_6');
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          return;
+        }
+        
+        const response = await fetch('/api/fields/STEP_6', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const result = await response.json();
         
         if (result.success && result.data) {
@@ -262,8 +274,18 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
   ];
 
   if (loading) {
-    return <LoadingSpinner title="Causas básicas o subyacentes (CB)
-" />;
+    return <LoadingSpinner title="Causas básicas o subyacentes (CB)" />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-red-500 text-center">
+          <p className="text-lg font-medium">Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   const toggleItem = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string) => {

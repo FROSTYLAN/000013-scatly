@@ -17,7 +17,7 @@ export async function GET(
     console.log(`📋 GET /api/projects/${projectId}/fields - Obteniendo campos del proyecto...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(
     console.log(`➕ POST /api/projects/${projectId}/fields - Agregando campo al proyecto...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(
@@ -183,7 +183,7 @@ export async function DELETE(
     console.log(`🗑️ DELETE /api/projects/${projectId}/fields - Eliminando todos los campos del proyecto...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(

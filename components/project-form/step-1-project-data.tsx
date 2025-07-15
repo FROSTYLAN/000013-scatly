@@ -37,7 +37,20 @@ export function Step1ProjectData({ formData, updateFormData }: Step1Props) {
     const fetchFieldData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/fields/STEP_1');
+        
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          setLoading(false);
+          return;
+        }
+        
+        const response = await fetch('/api/fields/STEP_1', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const result = await response.json();
         
         if (result.success) {

@@ -17,7 +17,7 @@ export async function GET(
     console.log(`🔍 GET /api/fields/${fieldCode} - Obteniendo campo...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(
@@ -77,7 +77,7 @@ export async function PUT(
     console.log(`✏️ PUT /api/fields/${fieldCode} - Actualizando campo...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(
@@ -183,7 +183,7 @@ export async function DELETE(
     console.log(`🗑️ DELETE /api/fields/${fieldCode} - Eliminando campo...`);
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(

@@ -26,7 +26,18 @@ export function Step5ImmediateCauses({ formData, updateFormData }: Step5Props) {
   useEffect(() => {
     const fetchFields = async () => {
       try {
-        const response = await fetch('/api/fields/STEP_5');
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          return;
+        }
+        
+        const response = await fetch('/api/fields/STEP_5', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const result = await response.json();
         
         if (result.success) {

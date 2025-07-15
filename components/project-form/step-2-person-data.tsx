@@ -37,9 +37,22 @@ export function Step2PersonData({ formData, updateNestedFormData }: Step2Props) 
     const fetchFieldData = async () => {
       try {
         setLoading(true);
+        
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          setLoading(false);
+          return;
+        }
+        
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
+        
         const [investigatorResponse, victimResponse] = await Promise.all([
-          fetch('/api/fields/STEP_2_A'),
-          fetch('/api/fields/STEP_2_B')
+          fetch('/api/fields/STEP_2_A', { headers }),
+          fetch('/api/fields/STEP_2_B', { headers })
         ]);
         
         const investigatorResult = await investigatorResponse.json();

@@ -40,7 +40,21 @@ export function Step7CorrectiveActions({
   useEffect(() => {
     const fetchNACCategories = async () => {
       try {
-        const response = await fetch('/api/fields/STEP_7');
+        setLoading(true);
+        
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          setLoading(false);
+          return;
+        }
+        
+        const response = await fetch('/api/fields/STEP_7', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const data = await response.json();
         
         if (data.success && data.data) {

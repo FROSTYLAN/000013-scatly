@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     console.log('➕ POST /api/fields - Creando nuevo campo...');
     
     // Verificar autenticación
-    const authResult = await verifyAuth(request);
+    const authResult = verifyAuth(request);
     if (!authResult.success) {
       console.log('❌ Usuario no autenticado');
       return NextResponse.json(

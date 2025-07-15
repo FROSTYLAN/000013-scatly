@@ -25,7 +25,20 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
     const fetchFieldData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/fields/STEP_4');
+        
+        // Obtener token de localStorage
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setError('No hay token de autenticación');
+          setLoading(false);
+          return;
+        }
+        
+        const response = await fetch('/api/fields/STEP_4', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const result = await response.json();
         
         if (result.success) {
@@ -78,7 +91,7 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
   }) || [];
 
   if (loading) {
-    return <LoadingSpinner title="Tipo de Contacto o Cuasi Contacto con Energía o Sustancia
+    return <LoadingSpinner title="Tipo de contacto o cuasi contacto con energía o sustancia
 " />;
   }
 
