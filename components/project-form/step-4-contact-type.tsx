@@ -4,7 +4,10 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Step4Props {
   formData: ProjectData;
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
 }
 
 interface FieldData {
@@ -16,7 +19,13 @@ interface FieldData {
   children: FieldData[];
 }
 
-export function Step4ContactType({ formData, updateFormData }: Step4Props) {
+export function Step4ContactType({ 
+  formData, 
+  updateStepField, 
+  removeStepField, 
+  getStepFieldComment, 
+  isStepFieldSelected 
+}: Step4Props) {
   const [contactData, setContactData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,26 +66,18 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
     fetchFieldData();
   }, []);
 
-  const toggleContactType = (title: string, code: string) => {
-    const currentTypes = formData.contactTypes || [];
-    const typeIndex = currentTypes.findIndex(t => t.title === title);
-    
-    if (typeIndex >= 0) {
-      // Si ya existe, lo removemos
-      const newTypes = currentTypes.filter(t => t.title !== title);
-      updateFormData('contactTypes', newTypes);
+  const toggleContactType = (fieldId: number) => {
+    if (isStepFieldSelected('step4Fields', fieldId)) {
+      // Si ya está seleccionado, lo removemos
+      removeStepField('step4Fields', fieldId);
     } else {
-      // Si no existe, lo agregamos con un comentario vacío
-      updateFormData('contactTypes', [...currentTypes, { title, comment: '', code }]);
+      // Si no está seleccionado, lo agregamos con comentario vacío
+      updateStepField('step4Fields', fieldId, '');
     }
   };
 
-  const updateComment = (title: string, comment: string) => {
-    const currentTypes = formData.contactTypes || [];
-    const newTypes = currentTypes.map(t => 
-      t.title === title ? { ...t, comment } : t
-    );
-    updateFormData('contactTypes', newTypes);
+  const updateComment = (fieldId: number, comment: string) => {
+    updateStepField('step4Fields', fieldId, comment);
   };
 
   const getContactNumber = (code: string) => {
@@ -112,8 +113,8 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
       
       <div className="space-y-4">
         {sortedChildren.map((type) => {
-          const isSelected = formData.contactTypes?.some(t => t.title === type.name) || false;
-          const currentComment = formData.contactTypes?.find(t => t.title === type.name)?.comment || '';
+          const isSelected = isStepFieldSelected('step4Fields', type.id);
+          const currentComment = getStepFieldComment('step4Fields', type.id);
           const contactNumber = getContactNumber(type.code);
 
           return (
@@ -121,7 +122,7 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
               <input
                 type="checkbox"
                 checked={isSelected}
-                onChange={() => toggleContactType(type.name, type.code)}
+                onChange={() => toggleContactType(type.id)}
                 className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
               />
               <div className="space-y-2 flex-1">
@@ -133,7 +134,7 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
                     <textarea
                       placeholder="Agregar un comentario..."
                       value={currentComment}
-                      onChange={(e) => updateComment(type.name, e.target.value)}
+                      onChange={(e) => updateComment(type.id, e.target.value)}
                       className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                       rows={3}
                     />

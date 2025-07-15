@@ -1,0 +1,1106 @@
+{
+    "name": "Proyecto de ejemplo",
+    "description": "alguna descripcion breve del accidente",
+    "date": "2025-07-02",
+    "investigator": {
+        "name": "Charles Duck",
+        "lastName": "Castillo Rosa",
+        "dni": "75867760",
+        "position": "Jefe de proyecto"
+    },
+    "accidentVictim": {
+        "name": "Diego",
+        "lastName": "Soles",
+        "age": "22",
+        "dni": "12345678",
+        "position": "Minero",
+        "miningCompany": "Minera Anaconda",
+        "employed": "IDK"
+    },
+    "potentialSeverity": "grave",
+    "potentialSeverityComment": "colocar algo",
+    "potentialProbability": "moderada",
+    "potentialProbabilityComment": "moderada....",
+    "potentialFrequency": "baja",
+    "potentialFrequencyComment": "baja......",
+    "contactTypes": [
+        {
+            "title": "Golpeado por (Impactado por objeto en movimiento)",
+            "comment": ""
+        },
+        {
+            "title": "Caída en el mismo nivel (Resbalar y caer, tropezar)",
+            "comment": "holaaa",
+            "code": "S4_4"
+        },
+        {
+            "title": "Sobretensión; Sobre-esfuerzo; Sobrecarga",
+            "comment": "adiosss",
+            "code": "S4_9"
+        }
+    ],
+    "immediateActionsUnsafe": [
+        {
+            "text": "Operar sin autorización",
+            "comment": "",
+            "reference": "(Ver CI 2,3,4,5,7,8,12,13)",
+            "subcauses": [
+                {
+                    "text": "Falta de capacitación",
+                    "selected": true,
+                    "comment": ""
+                },
+                {
+                    "text": "Desconocimiento de procedimientos",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Exceso de confianza",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Presión por tiempo",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Falta de supervisión",
+                    "selected": false,
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "text": "Operar equipo sin autorización",
+            "comment": "aca un comentario general",
+            "reference": "(S5_C1_1)",
+            "subcauses": [
+                {
+                    "text": "¿Tiene autorización del supervisor o del responsable del equipo?",
+                    "selected": true,
+                    "comment": "subcausa"
+                },
+                {
+                    "text": "¿Tiene autorización de MYSRL?",
+                    "selected": false,
+                    "comment": ""
+                }
+            ]
+        }
+    ],
+    "immediateConditionsUnsafe": [
+        {
+            "text": "Equipo de protección inadecuado o impropio",
+            "comment": "",
+            "reference": "(Ver CR 1,2,3,4,5,6,7,8,9,10,11,12,13)",
+            "subcauses": [
+                {
+                    "text": "Mal estado",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Talla incorrecta",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Tipo inadecuado",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Falta de mantenimiento",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Baja calidad",
+                    "selected": false,
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "text": "Guardas o barreras inadecuadas",
+            "comment": "comentario general",
+            "reference": "(S5_C2_1)",
+            "subcauses": [
+                {
+                    "text": "Guardas o barreras de contención inadecuadas o ausentes",
+                    "selected": true,
+                    "comment": "subcausa"
+                }
+            ]
+        }
+    ],
+    "basicFactorsPersonal": [
+        {
+            "text": "Capacidad física / Fisiológica inadecuada",
+            "comment": "asdasd",
+            "reference": "S6_C1_1",
+            "subcauses": [
+                {
+                    "text": "Estatura, peso, tamaño, fuerza, alcance, etc. inadecuados",
+                    "selected": true,
+                    "comment": "suba ca"
+                },
+                {
+                    "text": "Rango limitado de movimiento corporal",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Capacidad limitada para mantener posiciones del cuerpo",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Alergias o sensibilidad a sustancias",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Sensibilidad a extremos sensoriales",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Defecto de visión",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Defecto de audición",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Otros defectos sensoriales (tacto, gusto, olfato. equilibrio)",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Incapacidad respiratoria",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Otras capacidades físicas permanentes",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Incapacidades temporales",
+                    "selected": false,
+                    "comment": ""
+                }
+            ]
+        }
+    ],
+    "basicFactorsWork": [
+        {
+            "text": "Liderazgo y/o Supervisión Inadecuados",
+            "comment": "asdfas",
+            "reference": "S6_C2_1",
+            "subcauses": [
+                {
+                    "text": "Relaciones jerárquicas confusas o contradictorias",
+                    "selected": true,
+                    "comment": "asds"
+                },
+                {
+                    "text": "Asignación confusa o contradictoria de responsabilidades",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Delegación indebida o insuficiente",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Dar política, procedimiento, prácticas o pautas inadecuadas",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Dar objetivos, metas o estándares contradictorios",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Planificación o programación inadecuada del trabajo",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Instrucciones, orientación y/o entrenamiento inadecuados",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Proporcionar documentos de referencia, directivas y publicaciones de orientación inadecuadas",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Identificación y evaluación inadecuadas de exposición a pérdidas",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Falta de conocimiento del trabajo de supervisión /gerencial",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Calificaciones individuales incompatibles con los requisitos del trabajo o tarea",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Medición y evaluación inadecuada del desempeño",
+                    "selected": false,
+                    "comment": ""
+                },
+                {
+                    "text": "Retroalimentación inadecuada o incorrecta del desempeño",
+                    "selected": false,
+                    "comment": ""
+                }
+            ]
+        }
+    ],
+    "nacCategories": [
+        {
+            "category": "LIDERAZGO Y ADMINISTRACIÓN",
+            "subcategories": [
+                {
+                    "code": "S7_C1_1",
+                    "description": "Política General",
+                    "status": "P",
+                    "comment": "si todo correcto"
+                },
+                {
+                    "code": "S7_C1_2",
+                    "description": "Coordinador del Programa",
+                    "status": "E",
+                    "comment": "si son aduado"
+                },
+                {
+                    "code": "S7_C1_3",
+                    "description": "Participación de Gerencia Superior y Media",
+                    "status": "C",
+                    "comment": "no hay"
+                },
+                {
+                    "code": "S7_C1_4",
+                    "description": "Estándares de Desempeño Gerencial",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_5",
+                    "description": "Participación de Gerencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_6",
+                    "description": "Presentación en Reuniones de Gerencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_7",
+                    "description": "Manual de Referencia de Gerencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_8",
+                    "description": "Realización de Auditorías de Gerencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_9",
+                    "description": "Responsabilidad individual de Seguridad y Salud / Control de Pérdidas en Descripciones de Puestos",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_10",
+                    "description": "Establecimiento de Objetivos Anuales de Seguridad y Salud/Control de Pérdidas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_11",
+                    "description": "Comités Conjuntos de Seguridad y Salud y/o Delegados de Seguridad y Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_12",
+                    "description": "Negativa a trabajar debido al Procedimiento de Peligros de Seguridad y Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C1_13",
+                    "description": "Biblioteca de Referencia",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "ENTRENAMIENTO DE GERENCIA",
+            "subcategories": [
+                {
+                    "code": "S7_C2_1",
+                    "description": "Programa de Orientación/ Inducción de Gerencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C2_2",
+                    "description": "Entrenamiento Formal Inicial del Personal de Gerencia Superior",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C2_3",
+                    "description": "Revisión Formal y Entrenamiento Actualizado del Personal de Gerencia Superior",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C2_4",
+                    "description": "Entrenamiento Inicial Formal para Personal de Gerencia Media y Supervisores",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C2_5",
+                    "description": "Revisión Formal y Entrenamiento Actualizado del Personal de Gerencia Media y Supervisores",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C2_6",
+                    "description": "Entrenamiento Formal del Coordinador del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "INSPECCIONES PLANIFICADAS",
+            "subcategories": [
+                {
+                    "code": "S7_C3_1",
+                    "description": "Inspecciones Generales Planificadas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_2",
+                    "description": "Procedimientos de Seguimiento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_3",
+                    "description": "Análisis de Informe de Inspección",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_4",
+                    "description": "Programa de Inspección de Piezas/Rubros Críticos",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_5",
+                    "description": "Programa de Mantenimiento Preventivo",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_6",
+                    "description": "Inspección Previa al uso de Equipo Móvil y de Manipulación de Materiales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_7",
+                    "description": "Sistema de Informe de Condiciones Alternas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_8",
+                    "description": "Mantenimiento del Informe de Inspección General Planificada",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C3_9",
+                    "description": "Monitoreo Regular del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "ANÁLISIS Y PROCEDIMIENTOS DE TAREAS",
+            "subcategories": [
+                {
+                    "code": "S7_C4_1",
+                    "description": "Directiva de Gerencia sobre la Importancia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C4_2",
+                    "description": "Inventario de Tareas Críticas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C4_3",
+                    "description": "Objetivos de Análisis de Tareas y Procedimientos de Tareas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C4_4",
+                    "description": "Análisis y Procedimientos de Tareas Efectuados para Tareas Críticas y Actualizados Periódicamente",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C4_5",
+                    "description": "Peligros de Seguridad y Salud en los Análisis y Procedimientos de Tareas Críticas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C4_6",
+                    "description": "Monitoreo Regular del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "INVESTIGACIÓN DE ACCIDENTE / INCIDENTE",
+            "subcategories": [
+                {
+                    "code": "S7_C5_1",
+                    "description": "Procedimiento de investigación de Accidente/Incidente",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_2",
+                    "description": "Alcance e Investigaciones establecidos",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_3",
+                    "description": "Seguimiento y Medidas de Corrección",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_4",
+                    "description": "Utilización de Anuncio de Accidente Mayor",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_5",
+                    "description": "Uso de Información de Alto Potencial de Incidente",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_6",
+                    "description": "Participación de la Gerencia de Operaciones",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_7",
+                    "description": "Informe e Investigación de Incidentes",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_8",
+                    "description": "Mantenimiento de Informes de Accidente/Incidente",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C5_9",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "OBSERVACIÓN DE TAREAS",
+            "subcategories": [
+                {
+                    "code": "S7_C6_1",
+                    "description": "Directiva de Gerencia sobre su importancia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C6_2",
+                    "description": "Programa Completo de Observación de Tareas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C6_3",
+                    "description": "Nivel de Observación Completa de Tareas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C6_4",
+                    "description": "Programa de Observación de Tareas Parciales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C6_5",
+                    "description": "Análisis de Informe de Observación de Tareas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C6_6",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "PREPARACIÓN PARA EMERGENCIAS",
+            "subcategories": [
+                {
+                    "code": "S7_C7_1",
+                    "description": "Coordinador Designado",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_2",
+                    "description": "Plan de Emergencia por Escrito",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_3",
+                    "description": "Entrenamiento de Primeros Auxilios para Supervisor",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_4",
+                    "description": "Entrenamiento de Primeros Auxilios para el Personal (10%)",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_5",
+                    "description": "Iluminación y Energía de Emergencia Adecuadas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_6",
+                    "description": "Controles Principales con Código de Color y Rotulados",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_7",
+                    "description": "Equipo de Protección y de Rescate",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_8",
+                    "description": "Entrenamiento y Ejercicios del Equipo de Emergencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_9",
+                    "description": "Asistentes de Primeros Auxilios Calificados",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_10",
+                    "description": "Ayuda Exterior y Auxilio Mutuo Organizados",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_11",
+                    "description": "Protección de Registros Vitales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_12",
+                    "description": "Planificación para Etapa Posterior al Evento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_13",
+                    "description": "Se provee Comunicación de Emergencia",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C7_14",
+                    "description": "Comunicaciones de Seguridad Pública Planificadas",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "REGLAMENTOS DE LA COMPAÑÍA",
+            "subcategories": [
+                {
+                    "code": "S7_C8_1",
+                    "description": "Reglamento General de Seguridad y Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_2",
+                    "description": "Reglamento de Trabajo Especializado",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_3",
+                    "description": "Sistemas de Permiso de Trabajo y Procedimientos Especiales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_4",
+                    "description": "Programa de Educación y Revisión del Reglamento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_5",
+                    "description": "Esfuerzo de Cumplimiento del Reglamento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_6",
+                    "description": "Uso de Símbolos Educativos y Código de Colores",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C8_7",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "ANÁLISIS DE ACCIDENTE / INCIDENTE",
+            "subcategories": [
+                {
+                    "code": "S7_C9_1",
+                    "description": "Cálculo y Uso de Estadísticas de Desempeño",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C9_2",
+                    "description": "Análisis de Lesiones y Enfermedades Ocupacionales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C9_3",
+                    "description": "Identificación y Análisis de Daños a la Propiedad y Equipo",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C9_4",
+                    "description": "Equipos de Proyecto para Solución de Problemas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C9_5",
+                    "description": "Análisis de Incidentes (Cuasi accidentes )",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "ENTRENAMIENTO DEL PERSONAL",
+            "subcategories": [
+                {
+                    "code": "S7_C10_1",
+                    "description": "Análisis de Necesidades de Entrenamiento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C10_2",
+                    "description": "Programa de Entrenamiento del Personal",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C10_3",
+                    "description": "Evaluación del Programa de Entrenamiento",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "EQUIPO DE PROTECCIÓN PERSONAL",
+            "subcategories": [
+                {
+                    "code": "S7_C11_1",
+                    "description": "Estándares para Equipo de Protección Personal",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C11_2",
+                    "description": "Registros de Equipo de Protección Personal",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C11_3",
+                    "description": "Cumplimiento de Estándares",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C11_4",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "CONTROL DE LA SALUD",
+            "subcategories": [
+                {
+                    "code": "S7_C12_1",
+                    "description": "Identificación de Peligros para la Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_2",
+                    "description": "Control de Peligros de la Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_3",
+                    "description": "Información / Entrenamiento / Educación",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_4",
+                    "description": "Monitoreo de Higiene Industrial",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_5",
+                    "description": "Programa de Mantenimiento de la Salud",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_6",
+                    "description": "Asistencia Médica Profesional",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_7",
+                    "description": "Comunicaciones de Salud a los Trabajadores",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C12_8",
+                    "description": "Mantenimiento de Registros",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "SISTEMA DE EVALUACIÓN DEL PROGRAMA",
+            "subcategories": [
+                {
+                    "code": "S7_C13_1",
+                    "description": "Auditoría Completa del Cumplimiento de Estándares del Programa",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C13_2",
+                    "description": "Auditoría Completa del Cumplimiento de Estándares de Condiciones Físicas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C13_3",
+                    "description": "Auditoría Completa del Cumplimiento de Estándares de Prevención y Control de incendios",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C13_4",
+                    "description": "Auditoría Completa del Cumplimiento de Estándares de Salud Ocupacional",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C13_5",
+                    "description": "Registro de Sistemas de Evaluación de Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "CONTROLES DE INGENIERÍA",
+            "subcategories": [
+                {
+                    "code": "S7_C14_1",
+                    "description": "Consideraciones de Seguridad y Salud de ingeniería de Diseño en la Concepción y el Diseño",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C14_2",
+                    "description": "Consideraciones de Seguridad y Salud de Ingeniería de Proceso en la Concepción y el Diseño",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C14_3",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "COMUNICACIONES AL PERSONAL",
+            "subcategories": [
+                {
+                    "code": "S7_C15_1",
+                    "description": "Entrenamiento en Técnicas de Comunicación al Personal",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C15_2",
+                    "description": "Orientación / Inducción de Trabajo para Personal Nuevo/Transferido",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C15_3",
+                    "description": "Entrenamiento y Uso Adecuado de Instrucción de Tarea",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "REUNIONES GRUPALES",
+            "subcategories": [
+                {
+                    "code": "S7_C16_1",
+                    "description": "Realización de Reuniones Grupales",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C16_2",
+                    "description": "Registro del Asunto, Ayudas Visuales, Asistencia y Problemas Tratados",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C16_3",
+                    "description": "Participación de la Gerencia Superior y Media",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C16_4",
+                    "description": "Monitoreo Periódico del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "PROMOCIÓN GENERAL",
+            "subcategories": [
+                {
+                    "code": "S7_C17_1",
+                    "description": "Programa de Periódico Mural de Seguridad",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_2",
+                    "description": "Uso de Estadísticas y Hechos del Programa",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_3",
+                    "description": "Promoción de Temas Críticos",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_4",
+                    "description": "Uso de Premios o Reconocimiento",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_5",
+                    "description": "Publicaciones de Información el Programa",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_6",
+                    "description": "Promoción del Desempeño en Grupo",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_7",
+                    "description": "Promoción del Orden y la Limpieza",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C17_8",
+                    "description": "Registros de Actividades de Promoción del Programa",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "CONTRATACIÓN Y COLOCACIÓN DE PERSONAL",
+            "subcategories": [
+                {
+                    "code": "S7_C18_1",
+                    "description": "Análisis de la Capacidad Física",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C18_2",
+                    "description": "Examen Médico Pre-Ocupacional",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C18_3",
+                    "description": "Programa de Orientación / Inducción General",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C18_4",
+                    "description": "Verificación de Calificaciones Previa a la Contratación y Colocación",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "CONTROLES DE COMPRA",
+            "subcategories": [
+                {
+                    "code": "S7_C19_1",
+                    "description": "Compras Incluyen la Seguridad y Salud en las Especificaciones y Logística",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C19_2",
+                    "description": "Selección y Control de Contratistas",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        },
+        {
+            "category": "SEGURIDAD FUERA DEL TRABAJO",
+            "subcategories": [
+                {
+                    "code": "S7_C20_1",
+                    "description": "Establecimiento de Sistema de Informes y Análisis de Estadísticas",
+                    "status": "",
+                    "comment": ""
+                },
+                {
+                    "code": "S7_C20_2",
+                    "description": "Comunicación de información de Seguridad Fuera del Trabajo",
+                    "status": "",
+                    "comment": ""
+                }
+            ]
+        }
+    ],
+    "correctiveActions": []
+}

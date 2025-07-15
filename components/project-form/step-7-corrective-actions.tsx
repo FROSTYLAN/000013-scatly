@@ -15,15 +15,15 @@ interface FieldData {
 
 interface Step7Props {
   formData: ProjectData;
-  updateNACStatus: (categoryIndex: number, subcategoryIndex: number, status: 'P' | 'E' | 'C' | '') => void;
-  updateNACComment: (categoryIndex: number, subcategoryIndex: number, comment: string) => void;
+  updateNACField: (fieldId: number, status: 'P' | 'E' | 'C' | '', comment: string) => void;
+  getNACFieldData: (fieldId: number) => { status: 'P' | 'E' | 'C' | '', comment: string };
   updateFormData: (field: keyof ProjectData, value: any) => void;
 }
 
-export function Step7CorrectiveActions({ 
-  formData, 
-  updateNACStatus,
-  updateNACComment,
+export function Step7CorrectiveActions({
+  formData,
+  updateNACField,
+  getNACFieldData,
   updateFormData
 }: Step7Props) {
   const [nacCategories, setNacCategories] = useState<FieldData[]>([]);
@@ -43,7 +43,7 @@ export function Step7CorrectiveActions({
     const fetchNACCategories = async () => {
       try {
         setLoading(true);
-        
+
         // Obtener token de localStorage
         const token = localStorage.getItem('auth_token');
         if (!token) {
@@ -51,14 +51,14 @@ export function Step7CorrectiveActions({
           setLoading(false);
           return;
         }
-        
+
         const response = await fetch('/api/fields/STEP_7', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         const data = await response.json();
-        
+
         if (data.success && data.data) {
           console.log('Datos de la API:', data.data);
           const sortedCategories = (data.data.children || []).sort((a: any, b: any) => {
@@ -73,48 +73,10 @@ export function Step7CorrectiveActions({
               return numA - numB;
             })
           }));
-          
+
           console.log('Categorías de la API:', sortedCategories.map((cat: any) => cat.name));
           setNacCategories(sortedCategories);
-          
-          // Sincronizar formData.nacCategories con las categorías de la API
-          const updatedNACCategories = sortedCategories.map((apiCategory: any) => {
-            // Buscar si ya existe esta categoría en formData
-            const existingCategory = formData.nacCategories.find(cat => 
-              cat.category === apiCategory.name || cat.category.includes(apiCategory.name)
-            );
-            
-            if (existingCategory) {
-              // Si existe, mantener los datos existentes pero actualizar subcategorías si es necesario
-              return {
-                category: apiCategory.name,
-                subcategories: apiCategory.children.map((apiSub: any) => {
-                  const existingSub = existingCategory.subcategories.find(sub => sub.code === apiSub.code);
-                  return existingSub || {
-                    code: apiSub.code,
-                    description: apiSub.name,
-                    status: '' as const,
-                    comment: ''
-                  };
-                })
-              };
-            } else {
-              // Si no existe, crear nueva categoría
-              return {
-                category: apiCategory.name,
-                subcategories: apiCategory.children.map((apiSub: any) => ({
-                  code: apiSub.code,
-                  description: apiSub.name,
-                  status: '' as const,
-                  comment: ''
-                }))
-              };
-            }
-          });
-          
-          // Actualizar formData con las categorías sincronizadas
-          updateFormData('nacCategories', updatedNACCategories);
-          
+
           setError(null);
         } else {
           setError('Failed to load NAC categories');
@@ -132,38 +94,18 @@ export function Step7CorrectiveActions({
 
   if (loading) {
     return (
-      <LoadingSpinner 
-        title="Necesidades de acción de control (NAC) = Falta de control" 
-        message="Cargando categorías NAC..." 
+      <LoadingSpinner
+        title="Necesidades de acción de control (NAC) = Falta de control"
+        message="Cargando categorías NAC..."
       />
     );
   }
 
-  // Helper function to find category and subcategory indices in formData
-  const findFormDataIndices = (categoryName: string, subcategoryCode: string) => {
-    console.log('Buscando categoría:', categoryName);
-    console.log('Categorías disponibles en formData:', formData.nacCategories.map(cat => cat.category));
-    
-    const categoryIndex = formData.nacCategories.findIndex(cat => 
-      cat.category.includes(categoryName) || cat.category === categoryName
-    );
-    
-    console.log('Índice de categoría encontrado:', categoryIndex);
-    
-    if (categoryIndex === -1) return { categoryIndex: -1, subcategoryIndex: -1 };
-    
-    const subcategoryIndex = formData.nacCategories[categoryIndex].subcategories.findIndex(sub => 
-      sub.code === subcategoryCode
-    );
-    
-    console.log('Índice de subcategoría encontrado:', subcategoryIndex);
-    
-    return { categoryIndex, subcategoryIndex };
-  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Necesidades de Acción de Control (NAC) = Falta de Control</h2>
-      
+
       {/* Loading State */}
       {loading && (
         <div className="text-center py-8">
@@ -178,92 +120,7 @@ export function Step7CorrectiveActions({
         </div>
       )}
 
-      {/* NAC Categories */}
-      {!loading && !error && (
-        <div className="space-y-6">
-        {nacCategories.map((category, apiCategoryIndex) => {
-          // Find corresponding category in formData
-          const formCategoryIndex = formData.nacCategories.findIndex(cat => 
-            cat.category.includes(category.name) || cat.category === category.name
-          );
-          
-          return (
-            <div key={`category-${apiCategoryIndex}`} className="space-y-4">
-              <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
-              
-              <div className="grid gap-2">
-                {category.children.map((subcategory, apiSubcategoryIndex) => {
-                  // Find corresponding subcategory in formData
-                  const { categoryIndex, subcategoryIndex } = findFormDataIndices(category.name, subcategory.code);
-                  
-                  const formSubcategory = categoryIndex >= 0 && subcategoryIndex >= 0 
-                    ? formData.nacCategories[categoryIndex].subcategories[subcategoryIndex]
-                    : null;
-                  
-                  return (
-                    <div key={`subcategory-${apiCategoryIndex}-${apiSubcategoryIndex}`} 
-                         className="space-y-2">
-                      <div className="flex items-center gap-4 p-3 hover:bg-amber-100/10 rounded-lg transition-colors duration-200">
-                        <span className="flex-1 text-sm">{subcategory.name}</span>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              if (categoryIndex >= 0 && subcategoryIndex >= 0) {
-                                updateNACStatus(categoryIndex, subcategoryIndex, 'P');
-                              }
-                            }}
-                            className={`px-3 py-1 rounded transition-colors ${formSubcategory?.status === 'P' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                          >
-                            P
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (categoryIndex >= 0 && subcategoryIndex >= 0) {
-                                updateNACStatus(categoryIndex, subcategoryIndex, 'E');
-                              }
-                            }}
-                            className={`px-3 py-1 rounded transition-colors ${formSubcategory?.status === 'E' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                          >
-                            E
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (categoryIndex >= 0 && subcategoryIndex >= 0) {
-                                updateNACStatus(categoryIndex, subcategoryIndex, 'C');
-                              }
-                            }}
-                            className={`px-3 py-1 rounded transition-colors ${formSubcategory?.status === 'C' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                          >
-                            C
-                          </button>
-                        </div>
-                      </div>
-                      {formSubcategory?.status && (
-                        <div className="pl-[76px] pr-4">
-                          <textarea
-                            placeholder="Agregar un comentario..."
-                            value={formSubcategory.comment}
-                            onChange={(e) => {
-                              if (categoryIndex >= 0 && subcategoryIndex >= 0) {
-                                updateNACComment(categoryIndex, subcategoryIndex, e.target.value);
-                              }
-                            }}
-                            className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
-                            rows={2}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-         })}
-       </div>
-       )}
-
-       <div className="p-4 rounded-lg border border-amber-200 bg-amber-100/10">
+      <div className="p-4 rounded-lg border border-amber-200 bg-amber-100/10">
         <h4 className="font-medium mb-2">P-E-C LEYENDA:</h4>
         <div className="space-y-1 text-sm">
           <p><strong>P</strong> = ¿Tenemos estándares de programa para esta actividad?</p>
@@ -271,6 +128,73 @@ export function Step7CorrectiveActions({
           <p><strong>C</strong> = ¿Hay un cumplimiento total de los estándares?</p>
         </div>
       </div>
+
+      {/* NAC Categories */}
+      {!loading && !error && (
+        <div className="space-y-6">
+          {nacCategories.map((category, apiCategoryIndex) => {
+            return (
+              <div key={`category-${apiCategoryIndex}`} className="space-y-4">
+                <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
+
+                <div className="grid gap-2">
+                  {category.children.map((subcategory, apiSubcategoryIndex) => {
+                    const fieldData = getNACFieldData(subcategory.id);
+
+                    return (
+                      <div key={`subcategory-${apiCategoryIndex}-${apiSubcategoryIndex}`}
+                        className="space-y-2">
+                        <div className="flex items-center gap-4 p-3 hover:bg-amber-100/10 rounded-lg transition-colors duration-200">
+                          <span className="flex-1 text-sm">{subcategory.name}</span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                updateNACField(subcategory.id, 'P', fieldData.comment);
+                              }}
+                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'P' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
+                            >
+                              P
+                            </button>
+                            <button
+                              onClick={() => {
+                                updateNACField(subcategory.id, 'E', fieldData.comment);
+                              }}
+                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'E' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
+                            >
+                              E
+                            </button>
+                            <button
+                              onClick={() => {
+                                updateNACField(subcategory.id, 'C', fieldData.comment);
+                              }}
+                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'C' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
+                            >
+                              C
+                            </button>
+                          </div>
+                        </div>
+                        {fieldData.status && (
+                          <div className="pl-[76px] pr-4">
+                            <textarea
+                              placeholder="Agregar un comentario..."
+                              value={fieldData.comment}
+                              onChange={(e) => {
+                                updateNACField(subcategory.id, fieldData.status, e.target.value);
+                              }}
+                              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                              rows={2}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

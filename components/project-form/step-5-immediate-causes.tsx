@@ -15,10 +15,19 @@ interface FieldData {
 
 interface Step5Props {
   formData: ProjectData;
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
 }
 
-export function Step5ImmediateCauses({ formData, updateFormData }: Step5Props) {
+export function Step5ImmediateCauses({ 
+  formData, 
+  updateStepField, 
+  removeStepField, 
+  getStepFieldComment, 
+  isStepFieldSelected 
+}: Step5Props) {
   const [fieldsData, setFieldsData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,93 +80,24 @@ export function Step5ImmediateCauses({ formData, updateFormData }: Step5Props) {
   const unsafeActsCategory = fieldsData.children.find(child => child.code === 'S5_C1');
   const unsafeConditionsCategory = fieldsData.children.find(child => child.code === 'S5_C2');
 
-  const getFormFieldForActs = (code: string): 'immediateActionsUnsafe' => {
-    return 'immediateActionsUnsafe';
-  };
-
-  const getFormFieldForConditions = (code: string): 'immediateConditionsUnsafe' => {
-    return 'immediateConditionsUnsafe';
-  };
-
   const getLastNumber = (code: string): number => {
     const match = code.match(/(\d+)$/);
     return match ? parseInt(match[1], 10) : 0;
   };
 
-
-  const toggleItem = (field: 'immediateActionsUnsafe' | 'immediateConditionsUnsafe', fieldData: FieldData) => {
-    const currentItems = formData[field] || [];
-    const itemIndex = currentItems.findIndex(item => item.text === fieldData.name);
-
-    if (itemIndex >= 0) {
-      const newItems = currentItems.filter(item => item.text !== fieldData.name);
-      updateFormData(field, newItems);
+  const toggleField = (fieldId: number) => {
+    if (isStepFieldSelected('step5Fields', fieldId)) {
+      removeStepField('step5Fields', fieldId);
     } else {
-      const sortedSubcauses = fieldData.children.sort((a, b) => {
-        const numA = getLastNumber(a.code);
-        const numB = getLastNumber(b.code);
-        return numA - numB;
-      });
-
-      const newItem = {
-        text: fieldData.name,
-        comment: '',
-        reference: `(${fieldData.code})`,
-        subcauses: sortedSubcauses.map(child => ({
-          text: child.name,
-          selected: false,
-          comment: ''
-        }))
-      };
-      updateFormData(field, [...currentItems, newItem]);
+      updateStepField('step5Fields', fieldId, '');
     }
   };
 
-  const updateComment = (field: 'immediateActionsUnsafe' | 'immediateConditionsUnsafe', text: string, comment: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => 
-      item.text === text ? { ...item, comment } : item
-    );
-    updateFormData(field, newItems);
+  const updateFieldComment = (fieldId: number, comment: string) => {
+    updateStepField('step5Fields', fieldId, comment);
   };
 
-  const toggleSubcause = (field: 'immediateActionsUnsafe' | 'immediateConditionsUnsafe', itemText: string, subcauseText: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => {
-      if (item.text === itemText) {
-        return {
-          ...item,
-          subcauses: item.subcauses.map(subcause => 
-            subcause.text === subcauseText
-              ? { ...subcause, selected: !subcause.selected }
-              : subcause
-          )
-        };
-      }
-      return item;
-    });
-    updateFormData(field, newItems);
-  };
-
-  const updateSubcauseComment = (field: 'immediateActionsUnsafe' | 'immediateConditionsUnsafe', itemText: string, subcauseText: string, comment: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => {
-      if (item.text === itemText) {
-        return {
-          ...item,
-          subcauses: item.subcauses.map(subcause => 
-            subcause.text === subcauseText
-              ? { ...subcause, comment }
-              : subcause
-          )
-        };
-      }
-      return item;
-    });
-    updateFormData(field, newItems);
-  };
-
-  const renderCauseSection = (category: FieldData, field: 'immediateActionsUnsafe' | 'immediateConditionsUnsafe', title: string, colorClass: string) => {
+  const renderCategory = (category: FieldData) => {
     const sortedCauses = category.children.sort((a, b) => {
       const numA = getLastNumber(a.code);
       const numB = getLastNumber(b.code);
@@ -166,66 +106,84 @@ export function Step5ImmediateCauses({ formData, updateFormData }: Step5Props) {
 
     return (
       <div className="space-y-4">
-        <h3 className="font-medium text-center pb-2 border-b">{title}</h3>
+        <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
         <div className="space-y-2">
           {sortedCauses.map((cause) => {
-            const isSelected = formData[field]?.some(item => item.text === cause.name) || false;
-            const currentItem = formData[field]?.find(item => item.text === cause.name);
+            const isSelected = isStepFieldSelected('step5Fields', cause.id);
+            const currentComment = getStepFieldComment('step5Fields', cause.id);
+
+            // Sort subcauses
+            const sortedSubcauses = cause.children.sort((a, b) => {
+              const numA = getLastNumber(a.code);
+              const numB = getLastNumber(b.code);
+              return numA - numB;
+            });
 
             return (
-              <label key={cause.id} className={`flex items-start space-x-3 p-3 rounded-lg hover:${colorClass}/10 cursor-pointer transition-colors duration-200`}>
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => toggleItem(field, cause)}
-                  className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
-                />
-                <div className="space-y-2 flex-1">
-                  <div className="text-sm font-medium">{cause.name}</div>
-                  {isSelected && currentItem && (
-                    <div className="mt-2 space-y-2">
-                      {cause.children.length > 0 && (
-                        <>
-                          <div className="text-xs text-gray-600 font-medium">Subcausas:</div>
-                          <div className="space-y-3">
-                            {currentItem.subcauses.map((subcause, index) => (
-                              <div key={index} className="pl-4 space-y-2">
-                                <label className={`flex items-start space-x-2 p-2 rounded hover:${colorClass}/20 transition-colors duration-200`}>
-                                  <input
-                                    type="checkbox"
-                                    checked={subcause.selected}
-                                    onChange={() => toggleSubcause(field, cause.name, subcause.text)}
-                                    className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
-                                  />
-                                  <span className="text-xs text-gray-300">{subcause.text}</span>
-                                </label>
-                                {subcause.selected && (
-                                  <textarea
-                                    placeholder="Agregar un comentario para esta subcausa..."
-                                    value={subcause.comment}
-                                    onChange={(e) => updateSubcauseComment(field, cause.name, subcause.text, e.target.value)}
-                                    className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
-                                    rows={2}
-                                  />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                      {cause.has_comment && (
-                        <textarea
-                          placeholder="Agregar un comentario general..."
-                          value={currentItem.comment}
-                          onChange={(e) => updateComment(field, cause.name, e.target.value)}
-                          className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
-                          rows={3}
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              </label>
+              <div key={cause.id} className="space-y-2">
+                {/* Main cause */}
+                <label className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-100/10 cursor-pointer transition-colors duration-200">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleField(cause.id)}
+                    className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
+                  />
+                  <div className="space-y-2 flex-1">
+                    <div className="text-sm font-medium">{cause.name}</div>
+                  </div>
+                </label>
+
+                {/* Subcauses - Only show when main cause is selected */}
+                {isSelected && sortedSubcauses.length > 0 && (
+                  <div className="ml-8 space-y-2">
+                    {sortedSubcauses.map((subcause) => {
+                      const isSubcauseSelected = isStepFieldSelected('step5Fields', subcause.id);
+                      const subcauseComment = getStepFieldComment('step5Fields', subcause.id);
+
+                      return (
+                        <div key={subcause.id} className="space-y-2">
+                          <label className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-100/5 cursor-pointer transition-colors duration-200">
+                            <input
+                              type="checkbox"
+                              checked={isSubcauseSelected}
+                              onChange={() => toggleField(subcause.id)}
+                              className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
+                            />
+                            <div className="flex-1">
+                              <div className="text-sm text-gray-300">{subcause.name}</div>
+                            </div>
+                          </label>
+                          {isSubcauseSelected && (
+                            <div className="ml-6">
+                              <textarea
+                                placeholder="Agregar un comentario para esta subcausa..."
+                                value={subcauseComment}
+                                onChange={(e) => updateFieldComment(subcause.id, e.target.value)}
+                                className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                                rows={2}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* General comment for main cause */}
+                {isSelected && (
+                  <div className="ml-6 mt-3">
+                    <textarea
+                      placeholder="Comentario general para esta causa..."
+                      value={currentComment}
+                      onChange={(e) => updateFieldComment(cause.id, e.target.value)}
+                      className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
@@ -239,20 +197,10 @@ export function Step5ImmediateCauses({ formData, updateFormData }: Step5Props) {
       
       <div className="grid md:grid-cols-2 gap-8">
         {/* Actos Subestándares/Inseguros */}
-        {unsafeActsCategory && renderCauseSection(
-          unsafeActsCategory,
-          'immediateActionsUnsafe',
-          unsafeActsCategory.name,
-          'bg-purple-100'
-        )}
+        {unsafeActsCategory && renderCategory(unsafeActsCategory)}
 
         {/* Condiciones Subestándares/Inseguras */}
-        {unsafeConditionsCategory && renderCauseSection(
-          unsafeConditionsCategory,
-          'immediateConditionsUnsafe',
-          unsafeConditionsCategory.name,
-          'bg-amber-100'
-        )}
+        {unsafeConditionsCategory && renderCategory(unsafeConditionsCategory)}
       </div>
     </div>
   );

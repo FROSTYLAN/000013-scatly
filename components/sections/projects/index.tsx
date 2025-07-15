@@ -27,7 +27,6 @@ export default function ProjectsSection() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        debugger
         // Obtener token de localStorage
         const token = localStorage.getItem('auth_token');
         console.log('🔍 ProjectsSection - Token desde localStorage:', token ? token.substring(0, 20) + '...' : 'NO ENCONTRADO');

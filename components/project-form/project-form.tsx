@@ -33,7 +33,12 @@ export function ProjectForm() {
     error,
     updateFormData,
     updateNestedFormData,
-    updateNACStatus,
+    updateStepField,
+    removeStepField,
+    getStepFieldComment,
+    isStepFieldSelected,
+    updateNACField,
+    getNACFieldData,
     updateNACComment,
     nextStep,
     prevStep,
@@ -60,28 +65,40 @@ export function ProjectForm() {
         return (
           <Step3PotentialEvaluation
             formData={formData}
-            updateFormData={updateFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 4:
         return (
           <Step4ContactType
             formData={formData}
-            updateFormData={updateFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 5:
         return (
           <Step5ImmediateCauses
             formData={formData}
-            updateFormData={updateFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 6:
         return (
           <Step6BasicCauses
             formData={formData}
-            updateFormData={updateFormData}
+            updateStepField={updateStepField}
+            removeStepField={removeStepField}
+            getStepFieldComment={getStepFieldComment}
+            isStepFieldSelected={isStepFieldSelected}
           />
         );
       case 7:
@@ -89,8 +106,8 @@ export function ProjectForm() {
           <Step7CorrectiveActions
             formData={formData}
             updateFormData={updateFormData}
-            updateNACStatus={updateNACStatus}
-            updateNACComment={updateNACComment}
+            updateNACField={updateNACField}
+            getNACFieldData={getNACFieldData}
           />
         );
       default:

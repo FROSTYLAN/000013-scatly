@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProject, getAllProjects, getProjectsByUserId } from '@/lib/services/project-service';
+import { createProject, getProjectsByUserId } from '@/lib/services/project-service';
 import { CreateProjectInput } from '@/types/database-types';
 import { verifyAuth } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   console.log('🔍 GET /api/projects - Iniciando...');
-  debugger
   // Verificar autenticación
   const auth = verifyAuth(request);
   if (!auth.success) {

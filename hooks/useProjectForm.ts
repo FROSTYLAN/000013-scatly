@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ProjectData, projectEmpty, CorrectiveAction, BasicFactorItem } from '@/types/form-types';
+import { ProjectData, projectEmpty, CorrectiveAction, SelectedField, NACSubcategory } from '@/types/form-types';
 
 export const useProjectForm = () => {
   const params = useParams();
@@ -225,48 +225,59 @@ export const useProjectForm = () => {
     }));
   };
 
-  const updateNACStatus = (categoryIndex: number, subcategoryIndex: number, status: 'P' | 'E' | 'C' | '') => {
-    const updatedCategories = [...formData.nacCategories];
-    updatedCategories[categoryIndex].subcategories[subcategoryIndex].status = status;
-    setFormData(prev => ({
-      ...prev,
-      nacCategories: updatedCategories
-    }));
-  };
-
-  const updateBasicFactorComment = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string, comment: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item =>
-      item.text === text ? { ...item, comment } : item
-    );
-    setFormData(prev => ({
-      ...prev,
-      [field]: newItems
-    }));
-  };
-
-  const toggleBasicFactor = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string, category: string) => {
-    const currentItems = formData[field] || [];
-    const existingItemIndex = currentItems.findIndex(item => item.text === text);
-
-    if (existingItemIndex >= 0) {
-      const newItems = currentItems.filter(item => item.text !== text);
-      setFormData(prev => ({
-        ...prev,
-        [field]: newItems
-      }));
+  // Funciones para manejar campos simplificados con fieldId y comment
+  const updateStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => {
+    const currentFields = formData[step] || [];
+    const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
+    
+    if (existingIndex >= 0) {
+      // Actualizar campo existente
+      const newFields = [...currentFields];
+      newFields[existingIndex] = { fieldId, comment };
+      updateFormData(step, newFields);
     } else {
-      const newItem: BasicFactorItem = {
-        text,
-        comment: '',
-        category,
-        subcauses: []
-      };
-      setFormData(prev => ({
-        ...prev,
-        [field]: [...currentItems, newItem]
-      }));
+      // Agregar nuevo campo
+      updateFormData(step, [...currentFields, { fieldId, comment }]);
     }
+  };
+
+  const removeStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => {
+    const currentFields = formData[step] || [];
+    const newFields = currentFields.filter(field => field.fieldId !== fieldId);
+    updateFormData(step, newFields);
+  };
+
+  const getStepFieldComment = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number): string => {
+    const currentFields = formData[step] || [];
+    const field = currentFields.find(field => field.fieldId === fieldId);
+    return field?.comment || '';
+  };
+
+  const isStepFieldSelected = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number): boolean => {
+    const currentFields = formData[step] || [];
+    return currentFields.some(field => field.fieldId === fieldId);
+  };
+
+  // Funciones específicas para Step 7 (NAC)
+  const updateNACField = (fieldId: number, status: 'P' | 'E' | 'C' | '', comment: string) => {
+    const currentFields = formData.step7Fields || [];
+    const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
+    
+    if (existingIndex >= 0) {
+      // Actualizar campo existente
+      const newFields = [...currentFields];
+      newFields[existingIndex] = { fieldId, status, comment };
+      updateFormData('step7Fields', newFields);
+    } else {
+      // Agregar nuevo campo
+      updateFormData('step7Fields', [...currentFields, { fieldId, status, comment }]);
+    }
+  };
+
+  const getNACFieldData = (fieldId: number): { status: 'P' | 'E' | 'C' | '', comment: string } => {
+    const currentFields = formData.step7Fields || [];
+    const field = currentFields.find(field => field.fieldId === fieldId);
+    return field ? { status: field.status, comment: field.comment } : { status: '', comment: '' };
   };
 
   const nextStep = () => {
@@ -281,13 +292,16 @@ export const useProjectForm = () => {
     }
   };
 
-  const updateNACComment = (categoryIndex: number, subcategoryIndex: number, comment: string) => {
-    const updatedCategories = [...formData.nacCategories];
-    updatedCategories[categoryIndex].subcategories[subcategoryIndex].comment = comment;
-    setFormData(prev => ({
-      ...prev,
-      nacCategories: updatedCategories
-    }));
+  // Función legacy mantenida para compatibilidad (se puede eliminar después)
+  const updateNACComment = (fieldId: number, comment: string) => {
+    const currentFields = formData.step7Fields || [];
+    const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
+    
+    if (existingIndex >= 0) {
+      const newFields = [...currentFields];
+      newFields[existingIndex] = { ...newFields[existingIndex], comment };
+      updateFormData('step7Fields', newFields);
+    }
   };
 
   // Función para guardar el proyecto en la base de datos
@@ -373,10 +387,15 @@ export const useProjectForm = () => {
     updateArrayItem,
     addNewCorrectiveAction,
     updateCorrectiveAction,
-    updateNACStatus,
+    // Nuevas funciones para estructura simplificada
+    updateStepField,
+    removeStepField,
+    getStepFieldComment,
+    isStepFieldSelected,
+    updateNACField,
+    getNACFieldData,
+    // Función legacy
     updateNACComment,
-    updateBasicFactorComment,
-    toggleBasicFactor,
     nextStep,
     prevStep,
     saveProject

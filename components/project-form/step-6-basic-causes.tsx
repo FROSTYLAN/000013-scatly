@@ -24,10 +24,19 @@ interface ApiBasicCause {
 
 interface Step6Props {
   formData: ProjectData;
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
 }
 
-export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
+export function Step6BasicCauses({ 
+  formData, 
+  updateStepField, 
+  removeStepField, 
+  getStepFieldComment, 
+  isStepFieldSelected 
+}: Step6Props) {
   const [personalFactors, setPersonalFactors] = useState<ApiBasicCause[]>([]);
   const [workFactors, setWorkFactors] = useState<ApiBasicCause[]>([]);
   const [loading, setLoading] = useState(true);
@@ -288,80 +297,16 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
     );
   }
 
-  const toggleItem = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string) => {
-    const currentItems = formData[field] || [];
-    const itemIndex = currentItems.findIndex(item => item.text === text);
-    
-    const item = field === 'basicFactorsPersonal'
-      ? personalFactors.find(factor => factor.name === text)
-      : workFactors.find(factor => factor.name === text);
-
-    if (itemIndex >= 0) {
-      const newItems = currentItems.filter(item => item.text !== text);
-      updateFormData(field, newItems);
-    } else if (item) {
-      const sortedSubcauses = item.children.sort((a, b) => {
-        const numA = getLastNumber(a.code);
-        const numB = getLastNumber(b.code);
-        return numA - numB;
-      });
-      
-      const newItem = {
-        text,
-        comment: '',
-        reference: item.code,
-        subcauses: sortedSubcauses.map(subcause => ({
-          text: subcause.name,
-          selected: false,
-          comment: ''
-        }))
-      };
-      updateFormData(field, [...currentItems, newItem]);
+  const toggleField = (fieldId: number) => {
+    if (isStepFieldSelected('step6Fields', fieldId)) {
+      removeStepField('step6Fields', fieldId);
+    } else {
+      updateStepField('step6Fields', fieldId, '');
     }
   };
 
-  const updateComment = (field: 'basicFactorsPersonal' | 'basicFactorsWork', text: string, comment: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => 
-      item.text === text ? { ...item, comment } : item
-    );
-    updateFormData(field, newItems);
-  };
-
-  const toggleSubcause = (field: 'basicFactorsPersonal' | 'basicFactorsWork', itemText: string, subcauseText: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => {
-      if (item.text === itemText) {
-        return {
-          ...item,
-          subcauses: item.subcauses.map(subcause => 
-            subcause.text === subcauseText
-              ? { ...subcause, selected: !subcause.selected }
-              : subcause
-          )
-        };
-      }
-      return item;
-    });
-    updateFormData(field, newItems);
-  };
-
-  const updateSubcauseComment = (field: 'basicFactorsPersonal' | 'basicFactorsWork', itemText: string, subcauseText: string, comment: string) => {
-    const currentItems = formData[field] || [];
-    const newItems = currentItems.map(item => {
-      if (item.text === itemText) {
-        return {
-          ...item,
-          subcauses: item.subcauses.map(subcause => 
-            subcause.text === subcauseText
-              ? { ...subcause, comment }
-              : subcause
-          )
-        };
-      }
-      return item;
-    });
-    updateFormData(field, newItems);
+  const updateFieldComment = (fieldId: number, comment: string) => {
+    updateStepField('step6Fields', fieldId, comment);
   };
 
   return (
@@ -374,53 +319,68 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
           <h3 className="font-medium text-center pb-2 border-b">FACTORES PERSONALES</h3>
           <div className="space-y-2">
             {personalFactors.map((factor) => {
-              const isSelected = formData.basicFactorsPersonal?.some(item => item.text === factor.name) || false;
-              const currentItem = formData.basicFactorsPersonal?.find(item => item.text === factor.name);
+              const isSelected = isStepFieldSelected('step6Fields', factor.id);
+              const currentComment = getStepFieldComment('step6Fields', factor.id);
 
               return (
                 <div key={factor.id} className="space-y-2">
+                  {/* Main factor */}
                   <label className="flex items-start space-x-3 p-3 rounded-lg hover:bg-amber-100/10 cursor-pointer transition-colors duration-200">
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => toggleItem('basicFactorsPersonal', factor.name)}
+                      onChange={() => toggleField(factor.id)}
                       className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
                     />
                     <div className="space-y-2 flex-1">
                       <div className="text-sm font-medium">{factor.name}</div>
                     </div>
                   </label>
-                  {isSelected && currentItem && (
-                    <div className="ml-6 space-y-2">
-                      <div className="text-xs text-gray-600 font-medium">Subcausas:</div>
-                      <div className="space-y-3">
-                        {currentItem.subcauses.map((subcause, index) => (
-                          <div key={index} className="pl-4 space-y-2">
-                            <label className="flex items-start space-x-2 p-2 rounded hover:bg-amber-100/20 transition-colors duration-200">
+
+                  {/* Subcauses - Only show when main factor is selected */}
+                  {isSelected && factor.children.length > 0 && (
+                    <div className="ml-8 space-y-2">
+                      {factor.children.map((subcause) => {
+                        const isSubcauseSelected = isStepFieldSelected('step6Fields', subcause.id);
+                        const subcauseComment = getStepFieldComment('step6Fields', subcause.id);
+
+                        return (
+                          <div key={subcause.id} className="space-y-2">
+                            <label className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-100/5 cursor-pointer transition-colors duration-200">
                               <input
                                 type="checkbox"
-                                checked={subcause.selected}
-                                onChange={() => toggleSubcause('basicFactorsPersonal', factor.name, subcause.text)}
+                                checked={isSubcauseSelected}
+                                onChange={() => toggleField(subcause.id)}
                                 className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
                               />
-                              <span className="text-xs text-gray-300">{subcause.text}</span>
+                              <div className="flex-1">
+                                <div className="text-sm text-gray-300">{subcause.name}</div>
+                              </div>
                             </label>
-                            {subcause.selected && (
-                              <textarea
-                                placeholder="Agregar un comentario para esta subcausa..."
-                                value={subcause.comment}
-                                onChange={(e) => updateSubcauseComment('basicFactorsPersonal', factor.name, subcause.text, e.target.value)}
-                                className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
-                                rows={2}
-                              />
+                            {isSubcauseSelected && (
+                              <div className="ml-6">
+                                <textarea
+                                  placeholder="Agregar un comentario para esta subcausa..."
+                                  value={subcauseComment}
+                                  onChange={(e) => updateFieldComment(subcause.id, e.target.value)}
+                                  className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                                  rows={2}
+                                />
+                              </div>
                             )}
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* General comment for main factor */}
+                  {isSelected && (
+                    <div className="ml-6 mt-3">
                       <textarea
-                        placeholder="Agregar un comentario general..."
-                        value={currentItem.comment}
-                        onChange={(e) => updateComment('basicFactorsPersonal', factor.name, e.target.value)}
+                        placeholder="Comentario general para este factor..."
+                        value={currentComment}
+                        onChange={(e) => updateFieldComment(factor.id, e.target.value)}
                         className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                         rows={3}
                       />
@@ -437,53 +397,68 @@ export function Step6BasicCauses({ formData, updateFormData }: Step6Props) {
           <h3 className="font-medium text-center pb-2 border-b">FACTORES LABORALES</h3>
           <div className="space-y-2">
             {workFactors.map((factor) => {
-              const isSelected = formData.basicFactorsWork?.some(item => item.text === factor.name) || false;
-              const currentItem = formData.basicFactorsWork?.find(item => item.text === factor.name);
+              const isSelected = isStepFieldSelected('step6Fields', factor.id);
+              const currentComment = getStepFieldComment('step6Fields', factor.id);
 
               return (
                 <div key={factor.id} className="space-y-2">
+                  {/* Main factor */}
                   <label className="flex items-start space-x-3 p-3 rounded-lg hover:bg-amber-100/10 cursor-pointer transition-colors duration-200">
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => toggleItem('basicFactorsWork', factor.name)}
+                      onChange={() => toggleField(factor.id)}
                       className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
                     />
                     <div className="space-y-2 flex-1">
                       <div className="text-sm font-medium">{factor.name}</div>
                     </div>
                   </label>
-                  {isSelected && currentItem && (
-                    <div className="ml-6 space-y-2">
-                      <div className="text-xs text-gray-600 font-medium">Subcausas:</div>
-                      <div className="space-y-3">
-                        {currentItem.subcauses.map((subcause, index) => (
-                          <div key={index} className="pl-4 space-y-2">
-                            <label className="flex items-start space-x-2 p-2 rounded hover:bg-amber-100/20 transition-colors duration-200">
+
+                  {/* Subcauses - Only show when main factor is selected */}
+                  {isSelected && factor.children.length > 0 && (
+                    <div className="ml-8 space-y-2">
+                      {factor.children.map((subcause) => {
+                        const isSubcauseSelected = isStepFieldSelected('step6Fields', subcause.id);
+                        const subcauseComment = getStepFieldComment('step6Fields', subcause.id);
+
+                        return (
+                          <div key={subcause.id} className="space-y-2">
+                            <label className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-100/5 cursor-pointer transition-colors duration-200">
                               <input
                                 type="checkbox"
-                                checked={subcause.selected}
-                                onChange={() => toggleSubcause('basicFactorsWork', factor.name, subcause.text)}
+                                checked={isSubcauseSelected}
+                                onChange={() => toggleField(subcause.id)}
                                 className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
                               />
-                              <span className="text-xs text-gray-300">{subcause.text}</span>
+                              <div className="flex-1">
+                                <div className="text-sm text-gray-300">{subcause.name}</div>
+                              </div>
                             </label>
-                            {subcause.selected && (
-                              <textarea
-                                placeholder="Agregar un comentario para esta subcausa..."
-                                value={subcause.comment}
-                                onChange={(e) => updateSubcauseComment('basicFactorsWork', factor.name, subcause.text, e.target.value)}
-                                className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
-                                rows={2}
-                              />
+                            {isSubcauseSelected && (
+                              <div className="ml-6">
+                                <textarea
+                                  placeholder="Agregar un comentario para esta subcausa..."
+                                  value={subcauseComment}
+                                  onChange={(e) => updateFieldComment(subcause.id, e.target.value)}
+                                  className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                                  rows={2}
+                                />
+                              </div>
                             )}
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* General comment for main factor */}
+                  {isSelected && (
+                    <div className="ml-6 mt-3">
                       <textarea
-                        placeholder="Agregar un comentario general..."
-                        value={currentItem.comment}
-                        onChange={(e) => updateComment('basicFactorsWork', factor.name, e.target.value)}
+                        placeholder="Comentario general para este factor..."
+                        value={currentComment}
+                        onChange={(e) => updateFieldComment(factor.id, e.target.value)}
                         className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                         rows={3}
                       />

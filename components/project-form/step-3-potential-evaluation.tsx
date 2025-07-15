@@ -4,7 +4,10 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Step3PotentialEvaluationProps {
   formData: ProjectData;
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => void;
+  removeStepField: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => void;
+  getStepFieldComment: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => string;
+  isStepFieldSelected: (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => boolean;
 }
 
 interface FieldData {
@@ -16,7 +19,13 @@ interface FieldData {
   children: FieldData[];
 }
 
-export function Step3PotentialEvaluation({ formData, updateFormData }: Step3PotentialEvaluationProps) {
+export function Step3PotentialEvaluation({ 
+  formData, 
+  updateStepField, 
+  removeStepField, 
+  getStepFieldComment, 
+  isStepFieldSelected 
+}: Step3PotentialEvaluationProps) {
   const [evaluationData, setEvaluationData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,67 +90,50 @@ export function Step3PotentialEvaluation({ formData, updateFormData }: Step3Pote
     fetchFieldData();
   }, []);
 
-  const getFormField = (code: string) => {
-    switch (code) {
-      case 'S3_1': return 'potentialSeverity';
-      case 'S3_2': return 'potentialProbability';
-      case 'S3_3': return 'potentialFrequency';
-      default: return null;
-    }
+  // Función para obtener el fieldId seleccionado en una sección
+  const getSelectedFieldId = (sectionId: number): number | null => {
+    const selectedField = formData.step3Fields?.find(field => {
+      // Buscar en los children de la sección para ver cuál está seleccionado
+      const section = evaluationData?.children.find(s => s.id === sectionId);
+      return section?.children.some(child => child.id === field.fieldId);
+    });
+    return selectedField?.fieldId || null;
   };
 
-  const getCommentField = (code: string) => {
-    switch (code) {
-      case 'S3_1': return 'potentialSeverityComment';
-      case 'S3_2': return 'potentialProbabilityComment';
-      case 'S3_3': return 'potentialFrequencyComment';
-      default: return null;
+  // Función para manejar la selección de una opción
+  const handleOptionSelect = (optionId: number, sectionId: number) => {
+    // Primero, remover cualquier selección previa en esta sección
+    const section = evaluationData?.children.find(s => s.id === sectionId);
+    if (section) {
+      section.children.forEach(child => {
+        if (isStepFieldSelected('step3Fields', child.id)) {
+          removeStepField('step3Fields', child.id);
+        }
+      });
     }
-  };
-
-  const getOptionValue = (code: string) => {
-    switch (code) {
-      // Potencial de Severidad
-      case 'S3_1_1': return 'mayor';
-      case 'S3_1_2': return 'grave';
-      case 'S3_1_3': return 'menor';
-      // Probabilidad de Ocurrencia
-      case 'S3_2_1': return 'alta';
-      case 'S3_2_2': return 'moderada';
-      case 'S3_2_3': return 'rara';
-      // Frecuencia de Exposición
-      case 'S3_3_1': return 'grande';
-      case 'S3_3_2': return 'moderada';
-      case 'S3_3_3': return 'baja';
-      default: return null;
-    }
+    
+    // Luego, agregar la nueva selección
+    updateStepField('step3Fields', optionId, '');
   };
 
   const renderEvaluationSection = (section: FieldData) => {
-    const formField = getFormField(section.code);
-    const commentField = getCommentField(section.code);
-    
-    if (!formField || !commentField) return null;
-
-    const currentValue = formData[formField as keyof ProjectData] as string;
-    const currentComment = formData[commentField as keyof ProjectData] as string;
+    const selectedFieldId = getSelectedFieldId(section.id);
+    const selectedComment = selectedFieldId ? getStepFieldComment('step3Fields', selectedFieldId) : '';
 
     return (
       <div key={section.id} className="space-y-4">
         <label className="font-medium block">{section.name}</label>
         <div className="space-y-2">
           {section.children.map((option) => {
-            const optionValue = getOptionValue(option.code);
-            if (!optionValue) return null;
+            const isSelected = isStepFieldSelected('step3Fields', option.id);
 
             return (
               <label key={option.id} className="flex items-center space-x-2">
                 <input
                   type="radio"
-                  name={formField}
-                  value={optionValue}
-                  checked={currentValue === optionValue}
-                  onChange={(e) => updateFormData(formField as keyof ProjectData, e.target.value)}
+                  name={`section_${section.id}`}
+                  checked={isSelected}
+                  onChange={() => handleOptionSelect(option.id, section.id)}
                   className="form-radio"
                 />
                 <span>{option.name}</span>
@@ -149,11 +141,11 @@ export function Step3PotentialEvaluation({ formData, updateFormData }: Step3Pote
             );
           })}
         </div>
-        {section.has_comment && currentValue && (
+        {section.has_comment && selectedFieldId && (
           <textarea
             placeholder="Agregar un comentario..."
-            value={currentComment || ''}
-            onChange={(e) => updateFormData(commentField as keyof ProjectData, e.target.value)}
+            value={selectedComment}
+            onChange={(e) => updateStepField('step3Fields', selectedFieldId, e.target.value)}
             className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
             rows={2}
           />
