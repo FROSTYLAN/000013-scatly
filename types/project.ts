@@ -35,12 +35,7 @@ export type AccidentVictimData = PersonData & {
   employed: string;
 }
 
-export type CorrectiveAction = {
-  action: string;
-  responsible: string;
-  deadline: string;
-  status: 'pending' | 'in-progress' | 'completed';
-}
+
 
 export type NACCategory = {
   category: string;
@@ -86,7 +81,6 @@ export type ProjectData = {
 
   // Paso 7: Necesidades de Acción Correctiva (NAC)
   nacCategories: NACCategory[];
-  correctiveActions: CorrectiveAction[];
 }
 
 export const projectEmpty: ProjectData = {
@@ -145,20 +139,6 @@ export const projectEmpty: ProjectData = {
         { code: '2.2', description: 'Programa de Entrenamiento del Personal', status: '', comment: '' },
         { code: '2.3', description: 'Evaluación del Programa de Entrenamiento', status: '', comment: '' }
       ]
-    }
-  ],
-  correctiveActions: [
-    {
-      action: '',
-      responsible: '',
-      deadline: '',
-      status: 'pending'
-    },
-    {
-      action: '',
-      responsible: '',
-      deadline: '',
-      status: 'pending'
     }
   ]
 };

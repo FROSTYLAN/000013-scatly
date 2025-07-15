@@ -38,8 +38,9 @@ export function ProjectForm() {
     getStepFieldComment,
     isStepFieldSelected,
     updateNACField,
-    getNACFieldData,
-    updateNACComment,
+    removeNACField,
+    getNACFieldComment,
+    isNACFieldSelected,
     nextStep,
     prevStep,
     saveProject
@@ -105,9 +106,10 @@ export function ProjectForm() {
         return (
           <Step7CorrectiveActions
             formData={formData}
-            updateFormData={updateFormData}
             updateNACField={updateNACField}
-            getNACFieldData={getNACFieldData}
+            removeNACField={removeNACField}
+            getNACFieldComment={getNACFieldComment}
+            isNACFieldSelected={isNACFieldSelected}
           />
         );
       default:

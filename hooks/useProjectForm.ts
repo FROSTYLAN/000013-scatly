@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ProjectData, projectEmpty, CorrectiveAction, SelectedField, NACSubcategory } from '@/types/form-types';
+import { ProjectData, projectEmpty } from '@/types/form-types';
 
 export const useProjectForm = () => {
   const params = useParams();
@@ -31,7 +31,6 @@ export const useProjectForm = () => {
         // Si no existe un proyecto vacío en localStorage, crear uno nuevo y guardarlo
         const newEmptyProject = {
           ...projectEmpty,
-          correctiveActions: [],
           nacCategories: []
         };
         localStorage.setItem('empty_project', JSON.stringify(newEmptyProject));
@@ -56,7 +55,6 @@ export const useProjectForm = () => {
       // Si no existe un borrador para este ID, crear uno nuevo
       const newDraftProject = {
         ...projectEmpty,
-        correctiveActions: [],
         nacCategories: []
       };
       localStorage.setItem(`draft_project_${projectId}`, JSON.stringify(newDraftProject));
@@ -198,35 +196,8 @@ export const useProjectForm = () => {
     }
   };
 
-  const addNewCorrectiveAction = () => {
-    setFormData(prev => ({
-      ...prev,
-      correctiveActions: [
-        ...prev.correctiveActions,
-        {
-          action: '',
-          responsible: '',
-          deadline: '',
-          status: 'pending' as const
-        }
-      ]
-    }));
-  };
-
-  const updateCorrectiveAction = (index: number, field: keyof CorrectiveAction, value: string) => {
-    const newActions = [...formData.correctiveActions];
-    newActions[index] = {
-      ...newActions[index],
-      [field]: value
-    };
-    setFormData(prev => ({
-      ...prev,
-      correctiveActions: newActions
-    }));
-  };
-
   // Funciones para manejar campos simplificados con fieldId y comment
-  const updateStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number, comment: string) => {
+  const updateStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number, comment: string) => {
     const currentFields = formData[step] || [];
     const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
     
@@ -241,43 +212,40 @@ export const useProjectForm = () => {
     }
   };
 
-  const removeStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number) => {
+  const removeStepField = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => {
     const currentFields = formData[step] || [];
     const newFields = currentFields.filter(field => field.fieldId !== fieldId);
     updateFormData(step, newFields);
   };
 
-  const getStepFieldComment = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number): string => {
+  const getStepFieldComment = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): string => {
     const currentFields = formData[step] || [];
     const field = currentFields.find(field => field.fieldId === fieldId);
     return field?.comment || '';
   };
 
-  const isStepFieldSelected = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields', fieldId: number): boolean => {
+  const isStepFieldSelected = (step: 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number): boolean => {
     const currentFields = formData[step] || [];
     return currentFields.some(field => field.fieldId === fieldId);
   };
 
   // Funciones específicas para Step 7 (NAC)
-  const updateNACField = (fieldId: number, status: 'P' | 'E' | 'C' | '', comment: string) => {
-    const currentFields = formData.step7Fields || [];
-    const existingIndex = currentFields.findIndex(field => field.fieldId === fieldId);
-    
-    if (existingIndex >= 0) {
-      // Actualizar campo existente
-      const newFields = [...currentFields];
-      newFields[existingIndex] = { fieldId, status, comment };
-      updateFormData('step7Fields', newFields);
-    } else {
-      // Agregar nuevo campo
-      updateFormData('step7Fields', [...currentFields, { fieldId, status, comment }]);
-    }
+  // Ahora cada campo P, E, C es individual con su propio fieldId
+  // Usa la misma estructura que los otros steps: solo fieldId y comment
+  const updateNACField = (fieldId: number, comment: string) => {
+    updateStepField('step7Fields', fieldId, comment);
   };
 
-  const getNACFieldData = (fieldId: number): { status: 'P' | 'E' | 'C' | '', comment: string } => {
-    const currentFields = formData.step7Fields || [];
-    const field = currentFields.find(field => field.fieldId === fieldId);
-    return field ? { status: field.status, comment: field.comment } : { status: '', comment: '' };
+  const removeNACField = (fieldId: number) => {
+    removeStepField('step7Fields', fieldId);
+  };
+
+  const getNACFieldComment = (fieldId: number): string => {
+    return getStepFieldComment('step7Fields', fieldId);
+  };
+
+  const isNACFieldSelected = (fieldId: number): boolean => {
+    return isStepFieldSelected('step7Fields', fieldId);
   };
 
   const nextStep = () => {
@@ -353,7 +321,6 @@ export const useProjectForm = () => {
             // Si es el proyecto vacío (ID = 1), reiniciarlo
             const emptyProject = {
               ...projectEmpty,
-              correctiveActions: [],
               nacCategories: []
             };
             localStorage.setItem('empty_project', JSON.stringify(emptyProject));
@@ -385,15 +352,16 @@ export const useProjectForm = () => {
     updateNestedFormData,
     addNewItem,
     updateArrayItem,
-    addNewCorrectiveAction,
-    updateCorrectiveAction,
+
     // Nuevas funciones para estructura simplificada
     updateStepField,
     removeStepField,
     getStepFieldComment,
     isStepFieldSelected,
     updateNACField,
-    getNACFieldData,
+    removeNACField,
+    getNACFieldComment,
+    isNACFieldSelected,
     // Función legacy
     updateNACComment,
     nextStep,

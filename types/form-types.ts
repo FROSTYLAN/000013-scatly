@@ -19,18 +19,9 @@ export type AccidentVictimData = PersonData & {
   employed: string;
 }
 
-export type CorrectiveAction = {
-  action: string;
-  responsible: string;
-  deadline: string;
-  status: 'pending' | 'in-progress' | 'completed';
-}
 
-export type NACSubcategory = {
-  fieldId: number;
-  status: 'P' | 'E' | 'C' | '';
-  comment: string;
-}
+
+// Eliminado NACSubcategory - ahora Step 7 usa SelectedField como los otros steps
 
 export type ProjectData = {
   // Paso 1: Datos del Proyecto
@@ -55,8 +46,7 @@ export type ProjectData = {
   step6Fields: SelectedField[];
 
   // Paso 7: Necesidades de Acción Correctiva - Solo fieldId y comment
-  step7Fields: NACSubcategory[];
-  correctiveActions: CorrectiveAction[];
+  step7Fields: SelectedField[];
 }
 
 export const projectEmpty: ProjectData = {
@@ -82,19 +72,5 @@ export const projectEmpty: ProjectData = {
   step4Fields: [],
   step5Fields: [],
   step6Fields: [],
-  step7Fields: [],
-  correctiveActions: [
-    {
-      action: '',
-      responsible: '',
-      deadline: '',
-      status: 'pending'
-    },
-    {
-      action: '',
-      responsible: '',
-      deadline: '',
-      status: 'pending'
-    }
-  ]
+  step7Fields: []
 };

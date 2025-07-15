@@ -15,16 +15,18 @@ interface FieldData {
 
 interface Step7Props {
   formData: ProjectData;
-  updateNACField: (fieldId: number, status: 'P' | 'E' | 'C' | '', comment: string) => void;
-  getNACFieldData: (fieldId: number) => { status: 'P' | 'E' | 'C' | '', comment: string };
-  updateFormData: (field: keyof ProjectData, value: any) => void;
+  updateNACField: (fieldId: number, comment: string) => void;
+  removeNACField: (fieldId: number) => void;
+  getNACFieldComment: (fieldId: number) => string;
+  isNACFieldSelected: (fieldId: number) => boolean;
 }
 
 export function Step7CorrectiveActions({
   formData,
   updateNACField,
-  getNACFieldData,
-  updateFormData
+  removeNACField,
+  getNACFieldComment,
+  isNACFieldSelected
 }: Step7Props) {
   const [nacCategories, setNacCategories] = useState<FieldData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,33 @@ export function Step7CorrectiveActions({
       return parseInt(matches[matches.length - 1], 10);
     }
     return 0;
+  };
+
+  // Helper function to get P, E, C fields for a parent field
+  const getPECFields = (parentField: FieldData, allFields: FieldData[]): { P?: FieldData, E?: FieldData, C?: FieldData } => {
+    const pecFields = allFields.filter(field => field.parent_code === parentField.code);
+    return {
+      P: pecFields.find(field => field.name === 'P'),
+      E: pecFields.find(field => field.name === 'E'),
+      C: pecFields.find(field => field.name === 'C')
+    };
+  };
+
+  // Helper function to flatten all fields from the hierarchical structure
+  const flattenFields = (fields: FieldData[]): FieldData[] => {
+    const result: FieldData[] = [];
+    
+    const flatten = (fieldList: FieldData[]) => {
+      fieldList.forEach(field => {
+        result.push(field);
+        if (field.children && field.children.length > 0) {
+          flatten(field.children);
+        }
+      });
+    };
+    
+    flatten(fields);
+    return result;
   };
 
   useEffect(() => {
@@ -133,13 +162,22 @@ export function Step7CorrectiveActions({
       {!loading && !error && (
         <div className="space-y-6">
           {nacCategories.map((category, apiCategoryIndex) => {
+            // Get all fields flattened to find P, E, C fields
+            const allFields = flattenFields([category]);
+            
             return (
               <div key={`category-${apiCategoryIndex}`} className="space-y-4">
                 <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
 
                 <div className="grid gap-2">
                   {category.children.map((subcategory, apiSubcategoryIndex) => {
-                    const fieldData = getNACFieldData(subcategory.id);
+                    // Only show subcategories that have has_comment: true
+                    if (!subcategory.has_comment) {
+                      return null;
+                    }
+
+                    // Get P, E, C fields for this subcategory
+                    const pecFields = getPECFields(subcategory, allFields);
 
                     return (
                       <div key={`subcategory-${apiCategoryIndex}-${apiSubcategoryIndex}`}
@@ -147,39 +185,105 @@ export function Step7CorrectiveActions({
                         <div className="flex items-center gap-4 p-3 hover:bg-amber-100/10 rounded-lg transition-colors duration-200">
                           <span className="flex-1 text-sm">{subcategory.name}</span>
                           <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                updateNACField(subcategory.id, 'P', fieldData.comment);
-                              }}
-                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'P' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                            >
-                              P
-                            </button>
-                            <button
-                              onClick={() => {
-                                updateNACField(subcategory.id, 'E', fieldData.comment);
-                              }}
-                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'E' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                            >
-                              E
-                            </button>
-                            <button
-                              onClick={() => {
-                                updateNACField(subcategory.id, 'C', fieldData.comment);
-                              }}
-                              className={`px-3 py-1 rounded transition-colors ${fieldData.status === 'C' ? 'bg-amber-500 text-white' : 'text-amber-500 hover:bg-amber-100/20'}`}
-                            >
-                              C
-                            </button>
+                            {/* P Button */}
+                            {pecFields.P && (
+                              <button
+                                onClick={() => {
+                                  if (isNACFieldSelected(pecFields.P!.id)) {
+                                    removeNACField(pecFields.P!.id);
+                                  } else {
+                                    updateNACField(pecFields.P!.id, '');
+                                  }
+                                }}
+                                className={`px-3 py-1 rounded transition-colors ${
+                                  isNACFieldSelected(pecFields.P.id) 
+                                    ? 'bg-amber-500 text-white' 
+                                    : 'text-amber-500 hover:bg-amber-100/20'
+                                }`}
+                              >
+                                P
+                              </button>
+                            )}
+                            {/* E Button */}
+                            {pecFields.E && (
+                              <button
+                                onClick={() => {
+                                  if (isNACFieldSelected(pecFields.E!.id)) {
+                                    removeNACField(pecFields.E!.id);
+                                  } else {
+                                    updateNACField(pecFields.E!.id, '');
+                                  }
+                                }}
+                                className={`px-3 py-1 rounded transition-colors ${
+                                  isNACFieldSelected(pecFields.E.id) 
+                                    ? 'bg-amber-500 text-white' 
+                                    : 'text-amber-500 hover:bg-amber-100/20'
+                                }`}
+                              >
+                                E
+                              </button>
+                            )}
+                            {/* C Button */}
+                            {pecFields.C && (
+                              <button
+                                onClick={() => {
+                                  if (isNACFieldSelected(pecFields.C!.id)) {
+                                    removeNACField(pecFields.C!.id);
+                                  } else {
+                                    updateNACField(pecFields.C!.id, '');
+                                  }
+                                }}
+                                className={`px-3 py-1 rounded transition-colors ${
+                                  isNACFieldSelected(pecFields.C.id) 
+                                    ? 'bg-amber-500 text-white' 
+                                    : 'text-amber-500 hover:bg-amber-100/20'
+                                }`}
+                              >
+                                C
+                              </button>
+                            )}
                           </div>
                         </div>
-                        {fieldData.status && (
+                        
+                        {/* Show comment areas for active P, E, C fields */}
+                        {pecFields.P && isNACFieldSelected(pecFields.P.id) && (
                           <div className="pl-[76px] pr-4">
+                            <div className="text-xs text-amber-400 mb-1">P - ¿Tenemos estándares de programa para esta actividad?</div>
                             <textarea
                               placeholder="Agregar un comentario..."
-                              value={fieldData.comment}
+                              value={getNACFieldComment(pecFields.P.id)}
                               onChange={(e) => {
-                                updateNACField(subcategory.id, fieldData.status, e.target.value);
+                                updateNACField(pecFields.P!.id, e.target.value);
+                              }}
+                              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                              rows={2}
+                            />
+                          </div>
+                        )}
+                        
+                        {pecFields.E && isNACFieldSelected(pecFields.E.id) && (
+                          <div className="pl-[76px] pr-4">
+                            <div className="text-xs text-amber-400 mb-1">E - ¿Son adecuados los estándares existentes?</div>
+                            <textarea
+                              placeholder="Agregar un comentario..."
+                              value={getNACFieldComment(pecFields.E.id)}
+                              onChange={(e) => {
+                                updateNACField(pecFields.E!.id, e.target.value);
+                              }}
+                              className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
+                              rows={2}
+                            />
+                          </div>
+                        )}
+                        
+                        {pecFields.C && isNACFieldSelected(pecFields.C.id) && (
+                          <div className="pl-[76px] pr-4">
+                            <div className="text-xs text-amber-400 mb-1">C - ¿Hay un cumplimiento total de los estándares?</div>
+                            <textarea
+                              placeholder="Agregar un comentario..."
+                              value={getNACFieldComment(pecFields.C.id)}
+                              onChange={(e) => {
+                                updateNACField(pecFields.C!.id, e.target.value);
                               }}
                               className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                               rows={2}
