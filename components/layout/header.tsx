@@ -36,49 +36,55 @@ export default function Header() {
         {navItems.map((item) => {
           const isActive = item.id === activeNavId && item.path === activePath;
           return (
-            <Link
-              key={item.id}
-              href={item.path}
-              scroll
-              onClick={() => {
-                setActiveNavId(item.id);
-                setActivePath(item.path);
-              }}
-              className={cn(
-                'relative h-full w-fit md:min-w-40 border-x flex items-center justify-start gap-2 text-muted-foreground hover:bg-background px-4',
-                isActive && 'text-foreground bg-background'
-              )}
-            >
-              <item.icon size={18} />
-              <span className='text-sm pr-3'>{item.name}</span>
-
-              {item.id !== 1 &&
+            <div key={item.id} className="relative group">
+              <Link
+                href={item.path}
+                scroll
+                onClick={() => {
+                  setActiveNavId(item.id);
+                  setActivePath(item.path);
+                }}
+                className={cn(
+                  'relative h-12 w-fit min-w-32 max-w-48 border-x flex items-center justify-start gap-2 text-muted-foreground hover:bg-background px-3 transition-colors duration-200',
+                  isActive && 'text-foreground bg-background'
+                )}
+              >
+                <item.icon size={16} className="flex-shrink-0" />
+                <span className='text-sm truncate flex-1 min-w-0'>{item.name}</span>
+                
+                {/* Espacio para el botón de cerrar */}
+                {item.id !== 1 && <div className="w-6 flex-shrink-0" />}
+              </Link>
+              
+              {/* Botón de cerrar posicionado absolutamente */}
+              {item.id !== 1 && (
                 <button
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     handleClose(e, item);
                   }}
-                  className="absolute top-3 right-2 rounded-full hover:bg-red-100 transition-colors"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100"
+                  title="Cerrar pestaña"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="14"
+                    height="14"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-purple-300"
+                    className="text-muted-foreground hover:text-red-500 transition-colors"
                   >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
                 </button>
-              }
-            </Link>
+              )}
+            </div>
           );
         })}
         </div>

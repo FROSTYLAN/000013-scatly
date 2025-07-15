@@ -108,21 +108,53 @@ export default function ProjectsSection() {
       <div className='w-full'>
         {/* Mostramos un mensaje de carga mientras se obtienen los proyectos */}
         {loading && (
-          <div className="text-center p-4 w-full">
-            <div className="animate-pulse flex space-x-4 justify-center">
-              <div className="rounded-full bg-slate-700 h-10 w-10"></div>
-              <div className="flex-1 space-y-6 py-1 max-w-md">
-                <div className="h-2 bg-slate-700 rounded"></div>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                    <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+          <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mx-auto max-w-7xl">
+              {/* Skeleton para el botón de nuevo proyecto */}
+              <div className="animate-pulse">
+                <div className="bg-gradient-to-br from-slate-800/50 to-slate-700/50 border border-slate-600/30 rounded-xl p-6 h-48 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="h-4 bg-slate-600/50 rounded w-3/4"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-slate-600/30 rounded"></div>
+                      <div className="h-3 bg-slate-600/30 rounded w-5/6"></div>
+                    </div>
                   </div>
-                  <div className="h-2 bg-slate-700 rounded"></div>
+                  <div className="flex justify-between items-center">
+                    <div className="h-3 bg-slate-600/30 rounded w-1/3"></div>
+                    <div className="h-8 w-8 bg-slate-600/50 rounded-full"></div>
+                  </div>
                 </div>
               </div>
+              
+              {/* Skeletons para proyectos */}
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-gradient-to-br from-slate-800/30 to-slate-700/30 border border-slate-600/20 rounded-xl p-6 h-48 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="h-4 bg-slate-600/40 rounded w-4/5"></div>
+                      <div className="space-y-2">
+                        <div className="h-3 bg-slate-600/25 rounded"></div>
+                        <div className="h-3 bg-slate-600/25 rounded w-3/4"></div>
+                        <div className="h-3 bg-slate-600/25 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="h-3 bg-slate-600/25 rounded w-1/4"></div>
+                      <div className="h-8 w-8 bg-slate-600/40 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="mt-4">Cargando proyectos...</p>
+            
+            {/* Indicador de carga con texto */}
+            <div className="text-center mt-8">
+              <div className="inline-flex items-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                <p className="text-slate-400">Cargando proyectos...</p>
+              </div>
+            </div>
           </div>
         )}
         
