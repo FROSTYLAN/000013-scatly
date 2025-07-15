@@ -37,6 +37,65 @@ export async function getFieldById(id: number): Promise<Field | null> {
   }
 }
 
+export async function getFieldByCode(code: string): Promise<Field | null> {
+  try {
+    console.log(`🔍 Buscando campo con código: ${code}`);
+    const result = await db.query('SELECT * FROM fields WHERE code = $1', [code]);
+    
+    if (result.rows.length === 0) {
+      console.log(`❌ Campo con código ${code} no encontrado`);
+      return null;
+    }
+    
+    console.log(`✅ Campo encontrado: ${result.rows[0].name}`);
+    return result.rows[0];
+  } catch (error) {
+    console.error(`❌ Error buscando campo ${code}:`, error);
+    throw new Error('Error al buscar el campo');
+  }
+}
+
+// Función para construir estructura jerárquica anidada
+export async function getFieldWithChildren(code: string): Promise<any | null> {
+  try {
+    console.log(`🌳 Obteniendo campo ${code} con estructura jerárquica...`);
+    
+    // Obtener el campo principal
+    const mainField = await getFieldByCode(code);
+    if (!mainField) {
+      return null;
+    }
+    
+    // Función recursiva para obtener hijos
+    const getChildrenRecursive = async (parentCode: string): Promise<any[]> => {
+      const children = await getAllFields(parentCode);
+      const childrenWithSubChildren = [];
+      
+      for (const child of children) {
+        const childWithChildren = {
+          ...child,
+          children: await getChildrenRecursive(child.code)
+        };
+        childrenWithSubChildren.push(childWithChildren);
+      }
+      
+      return childrenWithSubChildren;
+    };
+    
+    // Construir el objeto completo con hijos anidados
+    const fieldWithChildren = {
+      ...mainField,
+      children: await getChildrenRecursive(mainField.code)
+    };
+    
+    console.log(`✅ Estructura jerárquica construida para ${code}`);
+    return fieldWithChildren;
+  } catch (error) {
+    console.error(`❌ Error construyendo estructura jerárquica para ${code}:`, error);
+    throw new Error('Error al construir la estructura jerárquica');
+  }
+}
+
 
 
 export async function createField(fieldData: CreateFieldInput): Promise<Field> {

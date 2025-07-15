@@ -1,60 +1,50 @@
 import { ProjectData } from '@/types/form-types';
+import { useEffect, useState } from 'react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface Step4Props {
   formData: ProjectData;
   updateFormData: (field: keyof ProjectData, value: any) => void;
 }
 
-export function Step4ContactType({ formData, updateFormData }: Step4Props) {
-  const contactTypes = [
-    {
-      id: 1,
-      title: 'Golpeado Contra (chocar contra algo)',
-      reference: '(Ver CI 1,2,3,4,5,6,11,12,13,14,15,16,17,18,19,20,26)'
-    },
-    {
-      id: 2,
-      title: 'Golpeado por (Impactado por objeto en movimiento)',
-      reference: '(Ver CI 1,2,3,4,5,6,11,12,13,14,15,16,17,18,19,20,26)'
-    },
-    {
-      id: 3,
-      title: 'Caída a un nivel más bajo',
-      reference: '(Ver CI 2,3,5,6,7,11,12,13,14,15,16,17,18,19,22)'
-    },
-    {
-      id: 4,
-      title: 'Caída en el mismo nivel (Resbalar y caer, tropezar)',
-      reference: '(Ver CI 4,5,6,11,12,13,14,15,16,17,18,22,26)'
-    },
-    {
-      id: 5,
-      title: 'Atrapado (Puntas de Pellizco y Mordida)',
-      reference: '(Ver CI 5,6,11,13,14,15,16,17,18)'
-    },
-    {
-      id: 6,
-      title: 'Cogido (Enganchado, Colgado)',
-      reference: '(Ver CI 5,6,11,12,13,14,15,16,17,18)'
-    },
-    {
-      id: 7,
-      title: 'Atrapado entre o debajo ( Chancado, Amputado)',
-      reference: '(Ver CI 1,2,3,4,5,6,11,12,13,14,15,16,22,26)'
-    },
-    {
-      id: 8,
-      title: 'Contacto con (Electricidad, Calor, Frío, Radiación, Cáusticos, Tóxicos, Ruido)',
-      reference: '(Ver CI 5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,25,27,26)'
-    },
-    {
-      id: 9,
-      title: 'Sobretensión / Sobre-esfuerzo / Sobrecarga',
-      reference: '(Ver CI 8,10,11,12,13,14,15)'
-    }
-  ];
+interface FieldData {
+  id: number;
+  name: string;
+  code: string;
+  parent_code: string | null;
+  has_comment: boolean;
+  children: FieldData[];
+}
 
-  const toggleContactType = (title: string) => {
+export function Step4ContactType({ formData, updateFormData }: Step4Props) {
+  const [contactData, setContactData] = useState<FieldData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFieldData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/fields/STEP_4');
+        const result = await response.json();
+        
+        if (result.success) {
+          setContactData(result.data);
+        } else {
+          setError('Error al cargar los campos');
+        }
+      } catch (err) {
+        setError('Error de conexión');
+        console.error('Error fetching field data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFieldData();
+  }, []);
+
+  const toggleContactType = (title: string, code: string) => {
     const currentTypes = formData.contactTypes || [];
     const typeIndex = currentTypes.findIndex(t => t.title === title);
     
@@ -64,7 +54,7 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
       updateFormData('contactTypes', newTypes);
     } else {
       // Si no existe, lo agregamos con un comentario vacío
-      updateFormData('contactTypes', [...currentTypes, { title, comment: '' }]);
+      updateFormData('contactTypes', [...currentTypes, { title, comment: '', code }]);
     }
   };
 
@@ -76,33 +66,61 @@ export function Step4ContactType({ formData, updateFormData }: Step4Props) {
     updateFormData('contactTypes', newTypes);
   };
 
+  const getContactNumber = (code: string) => {
+    const match = code.match(/(\d+)$/);
+    return match ? parseInt(match[1], 10) : 0;
+  };
+
+  const sortedChildren = contactData?.children.sort((a, b) => {
+    const numA = getContactNumber(a.code);
+    const numB = getContactNumber(b.code);
+    return numA - numB;
+  }) || [];
+
+  if (loading) {
+    return <LoadingSpinner title="Tipo de Contacto o Cuasi Contacto con Energía o Sustancia
+" />;
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">Tipo de Contacto o Cuasi Contacto con Energía o Sustancia</h2>
+        <div className="text-center py-8 text-red-500">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Tipo de Contacto o Cuasi Contacto con Energía o Sustancia</h2>
+      <h2 className="text-2xl font-bold">{contactData?.name || 'Tipo de Contacto o Cuasi Contacto con Energía o Sustancia'}</h2>
       
       <div className="space-y-4">
-        {contactTypes.map((type) => {
-          const isSelected = formData.contactTypes?.some(t => t.title === type.title) || false;
-          const currentComment = formData.contactTypes?.find(t => t.title === type.title)?.comment || '';
+        {sortedChildren.map((type) => {
+          const isSelected = formData.contactTypes?.some(t => t.title === type.name) || false;
+          const currentComment = formData.contactTypes?.find(t => t.title === type.name)?.comment || '';
+          const contactNumber = getContactNumber(type.code);
 
           return (
             <label key={type.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-amber-100/10 cursor-pointer transition-colors duration-200">
               <input
                 type="checkbox"
                 checked={isSelected}
-                onChange={() => toggleContactType(type.title)}
+                onChange={() => toggleContactType(type.name, type.code)}
                 className="mt-1 form-checkbox text-amber-500 focus:ring-amber-500"
               />
               <div className="space-y-2 flex-1">
                 <div className="font-medium">
-                  {type.id}. {type.title}
+                  {contactNumber}. {type.name}
                 </div>
-                {isSelected && (
+                {isSelected && type.has_comment && (
                   <div className="mt-2">
                     <textarea
                       placeholder="Agregar un comentario..."
                       value={currentComment}
-                      onChange={(e) => updateComment(type.title, e.target.value)}
+                      onChange={(e) => updateComment(type.name, e.target.value)}
                       className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                       rows={3}
                     />

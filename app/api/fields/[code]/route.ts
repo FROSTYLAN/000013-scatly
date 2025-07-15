@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth-utils';
 import { 
-  getFieldById, 
+  getFieldByCode, 
+  getFieldWithChildren,
   updateField, 
   deleteField 
 } from '@/lib/services/field-service';
@@ -9,11 +10,11 @@ import { UpdateFieldInput } from '@/types/database-types';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { code: string } }
 ) {
   try {
-    const fieldId = parseInt(params.id);
-    console.log(`🔍 GET /api/fields/${fieldId} - Obteniendo campo...`);
+    const fieldCode = params.code;
+    console.log(`🔍 GET /api/fields/${fieldCode} - Obteniendo campo...`);
     
     // Verificar autenticación
     const authResult = await verifyAuth(request);
@@ -25,21 +26,21 @@ export async function GET(
       );
     }
 
-    if (isNaN(fieldId)) {
-      console.log('❌ ID de campo inválido:', params.id);
+    if (!fieldCode || fieldCode.trim() === '') {
+      console.log('❌ Código de campo inválido:', params.code);
       return NextResponse.json(
         { 
           success: false, 
-          error: 'ID de campo inválido' 
+          error: 'Código de campo inválido' 
         },
         { status: 400 }
       );
     }
     
-    const field = await getFieldById(fieldId);
+    const fieldWithChildren = await getFieldWithChildren(fieldCode);
     
-    if (!field) {
-      console.log(`❌ Campo ${fieldId} no encontrado`);
+    if (!fieldWithChildren) {
+      console.log(`❌ Campo ${fieldCode} no encontrado`);
       return NextResponse.json(
         { 
           success: false, 
@@ -49,13 +50,13 @@ export async function GET(
       );
     }
     
-    console.log(`✅ Campo ${fieldId} obtenido exitosamente`);
+    console.log(`✅ Campo ${fieldCode} con estructura jerárquica obtenido exitosamente`);
     return NextResponse.json({
       success: true,
-      data: field
+      data: fieldWithChildren
     });
   } catch (error) {
-    console.error(`❌ Error en GET /api/fields/${params.id}:`, error);
+    console.error(`❌ Error en GET /api/fields/${params.code}:`, error);
     return NextResponse.json(
       { 
         success: false, 
@@ -69,11 +70,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { code: string } }
 ) {
   try {
-    const fieldId = parseInt(params.id);
-    console.log(`✏️ PUT /api/fields/${fieldId} - Actualizando campo...`);
+    const fieldCode = params.code;
+    console.log(`✏️ PUT /api/fields/${fieldCode} - Actualizando campo...`);
     
     // Verificar autenticación
     const authResult = await verifyAuth(request);
@@ -94,14 +95,27 @@ export async function PUT(
       );
     }
 
-    if (isNaN(fieldId)) {
-      console.log('❌ ID de campo inválido:', params.id);
+    if (!fieldCode || fieldCode.trim() === '') {
+      console.log('❌ Código de campo inválido:', params.code);
       return NextResponse.json(
         { 
           success: false, 
-          error: 'ID de campo inválido' 
+          error: 'Código de campo inválido' 
         },
         { status: 400 }
+      );
+    }
+
+    // Primero obtener el campo para conseguir su ID
+    const existingField = await getFieldByCode(fieldCode);
+    if (!existingField) {
+      console.log(`❌ Campo ${fieldCode} no encontrado`);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Campo no encontrado' 
+        },
+        { status: 404 }
       );
     }
 
@@ -128,10 +142,10 @@ export async function PUT(
     if (body.parent_code !== undefined) fieldData.parent_code = body.parent_code;
     if (body.has_comment !== undefined) fieldData.has_comment = body.has_comment;
     
-    const updatedField = await updateField(fieldId, fieldData);
+    const updatedField = await updateField(existingField.id, fieldData);
     
     if (!updatedField) {
-      console.log(`❌ Campo ${fieldId} no encontrado para actualizar`);
+      console.log(`❌ Campo ${fieldCode} no encontrado para actualizar`);
       return NextResponse.json(
         { 
           success: false, 
@@ -141,14 +155,14 @@ export async function PUT(
       );
     }
     
-    console.log(`✅ Campo ${fieldId} actualizado exitosamente`);
+    console.log(`✅ Campo ${fieldCode} actualizado exitosamente`);
     return NextResponse.json({
       success: true,
       message: 'Campo actualizado exitosamente',
       data: updatedField
     });
   } catch (error) {
-    console.error(`❌ Error en PUT /api/fields/${params.id}:`, error);
+    console.error(`❌ Error en PUT /api/fields/${params.code}:`, error);
     return NextResponse.json(
       { 
         success: false, 
@@ -162,11 +176,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { code: string } }
 ) {
   try {
-    const fieldId = parseInt(params.id);
-    console.log(`🗑️ DELETE /api/fields/${fieldId} - Eliminando campo...`);
+    const fieldCode = params.code;
+    console.log(`🗑️ DELETE /api/fields/${fieldCode} - Eliminando campo...`);
     
     // Verificar autenticación
     const authResult = await verifyAuth(request);
@@ -187,21 +201,21 @@ export async function DELETE(
       );
     }
 
-    if (isNaN(fieldId)) {
-      console.log('❌ ID de campo inválido:', params.id);
+    if (!fieldCode || fieldCode.trim() === '') {
+      console.log('❌ Código de campo inválido:', params.code);
       return NextResponse.json(
         { 
           success: false, 
-          error: 'ID de campo inválido' 
+          error: 'Código de campo inválido' 
         },
         { status: 400 }
       );
     }
     
-    const deleted = await deleteField(fieldId);
-    
-    if (!deleted) {
-      console.log(`❌ Campo ${fieldId} no encontrado para eliminar`);
+    // Primero obtener el campo para conseguir su ID
+    const existingField = await getFieldByCode(fieldCode);
+    if (!existingField) {
+      console.log(`❌ Campo ${fieldCode} no encontrado`);
       return NextResponse.json(
         { 
           success: false, 
@@ -211,13 +225,26 @@ export async function DELETE(
       );
     }
     
-    console.log(`✅ Campo ${fieldId} eliminado exitosamente`);
+    const deleted = await deleteField(existingField.id);
+    
+    if (!deleted) {
+      console.log(`❌ Campo ${fieldCode} no encontrado para eliminar`);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Campo no encontrado' 
+        },
+        { status: 404 }
+      );
+    }
+    
+    console.log(`✅ Campo ${fieldCode} eliminado exitosamente`);
     return NextResponse.json({
       success: true,
       message: 'Campo eliminado exitosamente'
     });
   } catch (error) {
-    console.error(`❌ Error en DELETE /api/fields/${params.id}:`, error);
+    console.error(`❌ Error en DELETE /api/fields/${params.code}:`, error);
     return NextResponse.json(
       { 
         success: false, 

@@ -74,7 +74,7 @@ export const DEFAULT_FIELDS = [
   {
     parent_code: null,
     code: 'STEP_4',
-    name: 'Tipo de Contacto o Cuasi Contacto con Energía o Sustancia',
+    name: 'Tipo de contacto o cuasi contacto con energía o sustancia',
     has_comment: false
   },
   { parent_code: 'STEP_4', code: 'S4_1', name: 'Golpeada Contra (chocar contra algo)', has_comment: true },
@@ -91,7 +91,7 @@ export const DEFAULT_FIELDS = [
   {
     parent_code: null,
     code: 'STEP_5',
-    name: 'Causas Inmediatas o Directas (CI)',
+    name: 'Causas inmediatas o directas (CI)',
     has_comment: false
   },
 
@@ -402,7 +402,7 @@ export const DEFAULT_FIELDS = [
   {
     parent_code: null,
     code: 'STEP_7',
-    name: 'Necesidades de Acción de Control (NAC) = Falta de Control',
+    name: 'Necesidades de acción de control (NAC) = Falta de control',
     has_comment: false
   },
   
