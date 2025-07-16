@@ -1,6 +1,6 @@
 import { db } from '@/lib/database';
 import { User, CreateUserInput, UserResponse } from '@/types/user-types';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // Obtener todos los usuarios (solo para administradores)
 export async function getAllUsers(): Promise<UserResponse[]> {

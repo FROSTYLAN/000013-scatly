@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { DEFAULT_FIELDS } from '@/lib/default-fields';
 
+// Forzar runtime dinámico para evitar generación estática
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 async function resetDatabase() {
   try {
     console.log('🧹 Limpiando base de datos...');

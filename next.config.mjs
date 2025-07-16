@@ -10,6 +10,11 @@ const nextConfig = {
   env: {
     POSTGRES_URL: process.env.POSTGRES_URL,
   },
+  experimental: {
+    staticPageGenerationTimeout: 120,
+  },
+  // Excluir rutas de API de la generación estática
+  output: 'standalone',
   async headers() {
     return [
       {
