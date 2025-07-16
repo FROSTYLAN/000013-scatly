@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Project } from '@/types/database-types';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { useNavStore } from '@/store/use-nav-store';
 
 export function ProjectDetail() {
@@ -12,10 +13,12 @@ export function ProjectDetail() {
   const router = useRouter();
   const { addNavItem, setActivePath } = useNavStore();
   const projectId = params?.id ? Number(params.id) : null;
-  
+
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -24,23 +27,23 @@ export function ProjectDetail() {
         setLoading(false);
         return;
       }
-      
+
       try {
         setLoading(true);
-        
+
         const token = localStorage.getItem('auth_token');
         if (!token) {
           console.log('No hay token, redirigiendo al login');
           window.location.href = '/login';
           return;
         }
-        
+
         const response = await fetch(`/api/projects/${projectId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+
         if (!response.ok) {
           if (response.status === 401) {
             console.log('Token inválido, redirigiendo al login');
@@ -50,9 +53,9 @@ export function ProjectDetail() {
           }
           throw new Error(`Error: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           setProject(data);
         } else {
@@ -65,7 +68,7 @@ export function ProjectDetail() {
         setLoading(false);
       }
     };
-    
+
     fetchProjectData();
   }, [projectId]);
 
@@ -160,11 +163,11 @@ export function ProjectDetail() {
         </Button>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-card rounded-xl shadow-lg overflow-hidden"
+        className="bg-card border border-muted-foreground/20 rounded-xl shadow-lg overflow-hidden"
       >
         <div className="bg-primary/10 p-6">
           <div className="flex justify-between items-start">
@@ -183,11 +186,10 @@ export function ProjectDetail() {
           </div>
         </div>
 
-        <div className="bg-muted/40 border border-muted-foreground/30 rounded-lg p-8 m-4">
-          <div className="space-y-6">
+          <div className="p-6 space-y-6">
             {/* Información del Proyecto */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">📋 Información del Proyecto</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">📋 Información del Proyecto</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground">Nombre del proyecto</label>
@@ -205,8 +207,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Datos del Investigador */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">🔍 Datos del Investigador</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">🔍 Datos del Investigador</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground">Nombre</label>
@@ -228,8 +230,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Datos del Accidentado */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">🚨 Datos del Accidentado</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">🚨 Datos del Accidentado</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground">Nombre</label>
@@ -263,8 +265,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Evaluación Potencial de Pérdida */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">⚠️ Evaluación Potencial de Pérdida</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">⚠️ Evaluación Potencial de Pérdida</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-muted/20 border border-red-200 p-4 rounded-lg">
                   <h3 className="font-medium text-foreground mb-2">Potencial de Severidad</h3>
@@ -303,8 +305,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Tipo de Contacto */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">💥 Tipo de Contacto con Energía o Sustancia</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">💥 Tipo de Contacto con Energía o Sustancia</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { code: 'S4_1', name: 'Golpeada Contra' },
@@ -329,8 +331,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Causas Inmediatas */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">🎯 Causas Inmediatas</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">🎯 Causas Inmediatas</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Actos Subestándar */}
                 <div className="bg-muted/20 border border-red-200 p-4 rounded-lg">
@@ -351,7 +353,7 @@ export function ProjectDetail() {
                     }).filter(Boolean)}
                   </div>
                 </div>
-                
+
                 {/* Condiciones Subestándar */}
                 <div className="bg-muted/20 border border-orange-200 p-4 rounded-lg">
                   <h3 className="font-semibold text-foreground mb-3">⚠️ Condiciones Subestándar/Inseguras</h3>
@@ -376,8 +378,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Causas Básicas */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">🔍 Causas Básicas/Subyacentes</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">🔍 Causas Básicas/Subyacentes</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Factores Personales */}
                 <div className="bg-muted/20 border border-purple-200 p-4 rounded-lg">
@@ -407,7 +409,7 @@ export function ProjectDetail() {
                     }).filter(Boolean)}
                   </div>
                 </div>
-                
+
                 {/* Factores Laborales */}
                 <div className="bg-muted/20 border border-green-200 p-4 rounded-lg">
                   <h3 className="font-semibold text-foreground mb-3">🏭 Factores Laborales</h3>
@@ -441,8 +443,8 @@ export function ProjectDetail() {
             </div>
 
             {/* Necesidades de Acción de Control */}
-          <div className="bg-muted/30 rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-2 text-primary/70">🛠️ Necesidades de Acción de Control</h2>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h2 className="text-lg font-medium mb-2 text-primary/70">🛠️ Necesidades de Acción de Control</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {[
                   { title: 'Liderazgo y Administración', code: 'S7_C1' },
@@ -464,11 +466,11 @@ export function ProjectDetail() {
             </div>
 
             {/* Acciones */}
-          <div className="bg-muted/30 rounded-lg p-4">
+            <div className="bg-muted/30 rounded-lg p-4">
               <h3 className="text-lg font-medium mb-2 text-primary/70">Acciones</h3>
               <div className="flex flex-col space-y-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => {
                     // Navegar a la página de edición del proyecto
@@ -488,30 +490,10 @@ export function ProjectDetail() {
                   </svg>
                   Editar Proyecto
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
-                  onClick={async () => {
-                    if (confirm('¿Estás seguro de que deseas eliminar este proyecto? Esta acción no se puede deshacer.')) {
-                      try {
-                        const response = await fetch(`/api/projects/${projectId}`, {
-                          method: 'DELETE',
-                          credentials: 'include'
-                        });
-                        
-                        if (response.ok) {
-                          // Redirigir a la página principal después de eliminar
-                          router.push('/');
-                        } else {
-                          const data = await response.json();
-                          alert(`Error al eliminar: ${data.error || 'Error desconocido'}`);
-                        }
-                      } catch (err) {
-                        console.error('Error al eliminar el proyecto:', err);
-                        alert('No se pudo eliminar el proyecto. Inténtalo de nuevo más tarde.');
-                      }
-                    }
-                  }}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-500/10"
+                  onClick={() => setShowDeleteModal(true)}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -520,9 +502,48 @@ export function ProjectDetail() {
                 </Button>
               </div>
             </div>
-          </div>
         </div>
       </motion.div>
+
+      {/* Modal de confirmación para eliminar */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={async () => {
+          setIsDeleting(true);
+          try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch(`/api/projects/${projectId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              setShowDeleteModal(false);
+              // Redirigir a la página principal después de eliminar
+              router.push('/');
+            } else {
+              const data = await response.json();
+              alert(`Error al eliminar: ${data.error || 'Error desconocido'}`);
+            }
+          } catch (err) {
+            console.error('Error al eliminar el proyecto:', err);
+            alert('No se pudo eliminar el proyecto. Inténtalo de nuevo más tarde.');
+          } finally {
+            setIsDeleting(false);
+          }
+        }}
+        title="Eliminar Proyecto"
+        message={`¿Estás seguro de que deseas eliminar el proyecto "${tituloField?.comment || 'Sin título'}"? Esta acción no se puede deshacer y se perderán todos los datos asociados.`}
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
