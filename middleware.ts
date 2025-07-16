@@ -47,11 +47,6 @@ export async function middleware(request: NextRequest) {
     });
   }
   
-  // Verificar si la ruta es pública
-  if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
-    return NextResponse.next();
-  }
-  
   // Verificar si la ruta requiere autenticación
   const requiresAuth = protectedPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
   
@@ -139,9 +134,10 @@ export const config = {
   matcher: [
     /*
      * Coincide con todas las rutas excepto:
-     * 1. Archivos estáticos (/_next/static, /favicon.ico, etc.)
-     * 2. Rutas de API que no requieren autenticación (configuradas en publicPaths)
+     * 1. Archivos estáticos
+     * 2. Rutas de autenticación
+     * 3. Rutas públicas
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|api/health|api/init).*)',
   ],
 };
