@@ -13,7 +13,31 @@ export async function getAllProjects(): Promise<Project[]> {
 
 export async function getProjectsByUserId(userId: number): Promise<Project[]> {
   try {
-    const result = await db.query('SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC', [userId]);
+    const result = await db.query(`
+      SELECT 
+        p.*,
+        (
+          SELECT pf.comment 
+          FROM project_fields pf 
+          WHERE pf.project_id = p.id 
+          AND pf.field_id = (SELECT id FROM fields WHERE code = 'S1_1')
+        ) as nombre,
+        (
+          SELECT pf.comment 
+          FROM project_fields pf 
+          WHERE pf.project_id = p.id 
+          AND pf.field_id = (SELECT id FROM fields WHERE code = 'S1_2')
+        ) as descripcion,
+        (
+          SELECT pf.comment 
+          FROM project_fields pf 
+          WHERE pf.project_id = p.id 
+          AND pf.field_id = (SELECT id FROM fields WHERE code = 'S1_3')
+        ) as fecha
+      FROM projects p
+      WHERE p.user_id = $1 
+      ORDER BY p.created_at DESC
+    `, [userId]);
     return result.rows as Project[];
   } catch (error) {
     console.error('Error al obtener proyectos por usuario:', error);

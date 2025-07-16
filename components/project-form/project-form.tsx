@@ -77,6 +77,7 @@ export function ProjectForm() {
             removeStepField={removeStepField}
             getStepFieldComment={getStepFieldComment}
             isStepFieldSelected={isStepFieldSelected}
+            updateFormData={updateFormData}
           />
         );
       case 4:

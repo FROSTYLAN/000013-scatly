@@ -8,6 +8,7 @@ interface Step3PotentialEvaluationProps {
   removeStepField: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => void;
   getStepFieldComment: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => string;
   isStepFieldSelected: (step: 'step1Fields' | 'step2Fields' | 'step3Fields' | 'step4Fields' | 'step5Fields' | 'step6Fields' | 'step7Fields', fieldId: number) => boolean;
+  updateFormData: (field: keyof ProjectData, value: any) => void;
 }
 
 interface FieldData {
@@ -24,7 +25,8 @@ export function Step3PotentialEvaluation({
   updateStepField, 
   removeStepField, 
   getStepFieldComment, 
-  isStepFieldSelected 
+  isStepFieldSelected,
+  updateFormData
 }: Step3PotentialEvaluationProps) {
   const [evaluationData, setEvaluationData] = useState<FieldData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,18 +104,30 @@ export function Step3PotentialEvaluation({
 
   // Función para manejar la selección de una opción
   const handleOptionSelect = (optionId: number, sectionId: number) => {
-    // Primero, remover cualquier selección previa en esta sección
+    // Obtener la sección actual
     const section = evaluationData?.children.find(s => s.id === sectionId);
-    if (section) {
-      section.children.forEach(child => {
-        if (isStepFieldSelected('step3Fields', child.id)) {
-          removeStepField('step3Fields', child.id);
-        }
-      });
-    }
+    if (!section) return;
     
-    // Luego, agregar la nueva selección
-    updateStepField('step3Fields', optionId, '');
+    // Obtener todos los campos actuales del step3
+    const currentFields = formData.step3Fields || [];
+    
+    // Buscar si ya hay un comentario existente en esta sección
+    const existingFieldInSection = currentFields.find(field => 
+      section.children.some(child => child.id === field.fieldId)
+    );
+    const existingComment = existingFieldInSection?.comment || '';
+    
+    // Filtrar para remover cualquier selección previa de esta sección
+    const fieldsToKeep = currentFields.filter(field => {
+      // Mantener solo los campos que NO pertenecen a esta sección
+      return !section.children.some(child => child.id === field.fieldId);
+    });
+    
+    // Agregar la nueva selección preservando el comentario existente
+    const newFields = [...fieldsToKeep, { fieldId: optionId, comment: existingComment }];
+    
+    // Actualizar directamente el formData usando updateFormData
+    updateFormData('step3Fields', newFields);
   };
 
   const renderEvaluationSection = (section: FieldData) => {
