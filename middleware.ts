@@ -39,10 +39,9 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
-        'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT',
-        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT,OPTIONS',
+        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization',
         'Access-Control-Max-Age': '86400'
       }
     });
@@ -91,10 +90,9 @@ export async function middleware(request: NextRequest) {
         status: 401,
         headers: { 
           'content-type': 'application/json',
-          'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
-          'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT',
-          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT,OPTIONS',
+          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
         }
       }
     );
@@ -127,10 +125,9 @@ export async function middleware(request: NextRequest) {
         status: 401,
         headers: { 
           'content-type': 'application/json',
-          'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': 'http://localhost:3000',
-          'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT',
-          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,DELETE,PATCH,POST,PUT,OPTIONS',
+          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
         }
       }
     );
