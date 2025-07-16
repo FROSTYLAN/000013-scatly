@@ -22,11 +22,11 @@ const nextConfig = {
           },
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:3000', // Actualizado para el puerto correcto
+            value: '*', // Permitir cualquier origen para Vercel
           },
           {
             key: 'Access-Control-Allow-Methods',
-            value: 'GET,DELETE,PATCH,POST,PUT',
+            value: 'GET,DELETE,PATCH,POST,PUT,OPTIONS',
           },
           {
             key: 'Access-Control-Allow-Headers',
