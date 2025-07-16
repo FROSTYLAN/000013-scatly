@@ -183,7 +183,7 @@ export function ProjectDetail() {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="bg-muted/40 border border-muted-foreground/30 rounded-lg p-8 m-4">
           <div className="space-y-6">
             {/* Información del Proyecto */}
           <div className="bg-muted/30 rounded-lg p-4">
