@@ -184,27 +184,287 @@ export function ProjectDetail() {
         </div>
 
         <div className="p-6">
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-3 text-primary/80">Descripción</h2>
-            <p className="text-muted-foreground whitespace-pre-line">{descripcionField?.comment || 'Sin descripción'}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-muted/30 rounded-lg p-4">
-              <h3 className="text-lg font-medium mb-2 text-primary/70">Información del Proyecto</h3>
-              <ul className="space-y-2">
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Creado:</span>
-                  <span>{new Date(project.created_at).toLocaleDateString()}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-muted-foreground">Última actualización:</span>
-                  <span>{new Date(project.updated_at).toLocaleDateString()}</span>
-                </li>
-              </ul>
+          <div className="space-y-6">
+            {/* Información del Proyecto */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📋 Información del Proyecto</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Nombre del proyecto</label>
+                  <p className="mt-1 text-sm text-gray-900">{tituloField?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Fecha</label>
+                  <p className="mt-1 text-sm text-gray-900">{formattedDate}</p>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Descripción</label>
+                  <p className="mt-1 text-sm text-gray-900">{descripcionField?.comment || 'No especificado'}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-muted/30 rounded-lg p-4">
+            {/* Datos del Investigador */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🔍 Datos del Investigador</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_A_1')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Apellido</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_A_2')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">DNI</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_A_3')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Cargo</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_A_4')?.comment || 'No especificado'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Datos del Accidentado */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🚨 Datos del Accidentado</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_1')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Apellido</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_2')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Edad</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_3')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">DNI</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_4')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Cargo</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_5')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Empresa minera</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_6')?.comment || 'No especificado'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Empleado</label>
+                  <p className="mt-1 text-sm text-gray-900">{fieldsMap.get('S2_B_7')?.comment || 'No especificado'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Evaluación Potencial de Pérdida */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">⚠️ Evaluación Potencial de Pérdida</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-red-900 mb-2">Potencial de Severidad</h3>
+                  <div className="space-y-2">
+                    {fieldsMap.get('S3_1_1') && <div className="flex items-center"><span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>Mayor (A)</div>}
+                    {fieldsMap.get('S3_1_2') && <div className="flex items-center"><span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>Grave (B)</div>}
+                    {fieldsMap.get('S3_1_3') && <div className="flex items-center"><span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>Menor (C)</div>}
+                  </div>
+                  {fieldsMap.get('S3_1')?.comment && (
+                    <p className="mt-2 text-sm text-gray-600">{fieldsMap.get('S3_1')?.comment}</p>
+                  )}
+                </div>
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-orange-900 mb-2">Probabilidad de Ocurrencia</h3>
+                  <div className="space-y-2">
+                    {fieldsMap.get('S3_2_1') && <div className="flex items-center"><span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>Alta (A)</div>}
+                    {fieldsMap.get('S3_2_2') && <div className="flex items-center"><span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>Moderada (B)</div>}
+                    {fieldsMap.get('S3_2_3') && <div className="flex items-center"><span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>Rara (C)</div>}
+                  </div>
+                  {fieldsMap.get('S3_2')?.comment && (
+                    <p className="mt-2 text-sm text-gray-600">{fieldsMap.get('S3_2')?.comment}</p>
+                  )}
+                </div>
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-yellow-900 mb-2">Frecuencia de Exposición</h3>
+                  <div className="space-y-2">
+                    {fieldsMap.get('S3_3_1') && <div className="flex items-center"><span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>Grande (A)</div>}
+                    {fieldsMap.get('S3_3_2') && <div className="flex items-center"><span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>Moderada (B)</div>}
+                    {fieldsMap.get('S3_3_3') && <div className="flex items-center"><span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>Baja (C)</div>}
+                  </div>
+                  {fieldsMap.get('S3_3')?.comment && (
+                    <p className="mt-2 text-sm text-gray-600">{fieldsMap.get('S3_3')?.comment}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Tipo de Contacto */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">💥 Tipo de Contacto con Energía o Sustancia</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { code: 'S4_1', name: 'Golpeada Contra' },
+                  { code: 'S4_2', name: 'Golpeado por' },
+                  { code: 'S4_3', name: 'Caída a nivel más bajo' },
+                  { code: 'S4_4', name: 'Caída en mismo nivel' },
+                  { code: 'S4_5', name: 'Atrapado' },
+                  { code: 'S4_6', name: 'Cogido' },
+                  { code: 'S4_7', name: 'Atrapado entre/debajo' },
+                  { code: 'S4_8', name: 'Contacto con' },
+                  { code: 'S4_9', name: 'Sobretensión/Sobreesfuerzo' }
+                ].map(item => {
+                  const field = fieldsMap.get(item.code);
+                  return field?.comment ? (
+                    <div key={item.code} className="bg-blue-50 p-3 rounded-lg">
+                      <h4 className="font-medium text-blue-900">{item.name}</h4>
+                      <p className="text-sm text-blue-700 mt-1">{field.comment}</p>
+                    </div>
+                  ) : null;
+                }).filter(Boolean)}
+              </div>
+            </div>
+
+            {/* Causas Inmediatas */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🎯 Causas Inmediatas</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Actos Subestándar */}
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-red-900 mb-3">🚫 Actos Subestándar/Inseguros</h3>
+                  <div className="space-y-2">
+                    {[
+                      'S5_C1_1', 'S5_C1_2', 'S5_C1_3', 'S5_C1_4', 'S5_C1_5',
+                      'S5_C1_6', 'S5_C1_7', 'S5_C1_8', 'S5_C1_9', 'S5_C1_10',
+                      'S5_C1_11', 'S5_C1_12', 'S5_C1_13', 'S5_C1_14', 'S5_C1_15', 'S5_C1_16'
+                    ].map(code => {
+                      const field = fieldsMap.get(code);
+                      return field?.comment ? (
+                        <div key={code} className="text-sm">
+                          <span className="font-medium">{field.field_name}:</span>
+                          <span className="ml-2 text-gray-700">{field.comment}</span>
+                        </div>
+                      ) : null;
+                    }).filter(Boolean)}
+                  </div>
+                </div>
+                
+                {/* Condiciones Subestándar */}
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-orange-900 mb-3">⚠️ Condiciones Subestándar/Inseguras</h3>
+                  <div className="space-y-2">
+                    {[
+                      'S5_C2_1', 'S5_C2_2', 'S5_C2_3', 'S5_C2_4', 'S5_C2_5',
+                      'S5_C2_6', 'S5_C2_7', 'S5_C2_8', 'S5_C2_9', 'S5_C2_10',
+                      'S5_C2_11', 'S5_C2_12', 'S5_C2_13', 'S5_C2_14', 'S5_C2_15',
+                      'S5_C2_16', 'S5_C2_17'
+                    ].map(code => {
+                      const field = fieldsMap.get(code);
+                      return field?.comment ? (
+                        <div key={code} className="text-sm">
+                          <span className="font-medium">{field.field_name}:</span>
+                          <span className="ml-2 text-gray-700">{field.comment}</span>
+                        </div>
+                      ) : null;
+                    }).filter(Boolean)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Causas Básicas */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🔍 Causas Básicas/Subyacentes</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Factores Personales */}
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-purple-900 mb-3">👤 Factores Personales</h3>
+                  <div className="space-y-3">
+                    {[
+                      { title: 'Capacidad Física/Fisiológica', codes: ['S6_C1_1'] },
+                      { title: 'Capacidad Mental/Psicológica', codes: ['S6_C1_2'] },
+                      { title: 'Tensión Física/Fisiológica', codes: ['S6_C1_3'] },
+                      { title: 'Tensión Mental/Psicológica', codes: ['S6_C1_4'] },
+                      { title: 'Falta de Conocimientos', codes: ['S6_C1_5'] },
+                      { title: 'Falta de Habilidad', codes: ['S6_C1_6'] },
+                      { title: 'Motivación Incorrecta', codes: ['S6_C1_7'] }
+                    ].map(category => {
+                      const hasData = category.codes.some(code => fieldsMap.get(code)?.comment);
+                      return hasData ? (
+                        <div key={category.title} className="border-l-4 border-purple-400 pl-3">
+                          <h4 className="font-medium text-purple-800">{category.title}</h4>
+                          {category.codes.map(code => {
+                            const field = fieldsMap.get(code);
+                            return field?.comment ? (
+                              <p key={code} className="text-sm text-purple-700 mt-1">{field.comment}</p>
+                            ) : null;
+                          })}
+                        </div>
+                      ) : null;
+                    }).filter(Boolean)}
+                  </div>
+                </div>
+                
+                {/* Factores Laborales */}
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-green-900 mb-3">🏭 Factores Laborales</h3>
+                  <div className="space-y-3">
+                    {[
+                      { title: 'Liderazgo/Supervisión', codes: ['S6_C2_1'] },
+                      { title: 'Ingeniería Inadecuada', codes: ['S6_C2_2'] },
+                      { title: 'Compras Inadecuadas', codes: ['S6_C2_3'] },
+                      { title: 'Mantenimiento Inadecuado', codes: ['S6_C2_4'] },
+                      { title: 'Herramientas y Equipo', codes: ['S6_C2_5'] },
+                      { title: 'Estándares de Trabajo', codes: ['S6_C2_6'] },
+                      { title: 'Desgaste Excesivo', codes: ['S6_C2_7'] },
+                      { title: 'Abuso o Mal Uso', codes: ['S6_C2_8'] }
+                    ].map(category => {
+                      const hasData = category.codes.some(code => fieldsMap.get(code)?.comment);
+                      return hasData ? (
+                        <div key={category.title} className="border-l-4 border-green-400 pl-3">
+                          <h4 className="font-medium text-green-800">{category.title}</h4>
+                          {category.codes.map(code => {
+                            const field = fieldsMap.get(code);
+                            return field?.comment ? (
+                              <p key={code} className="text-sm text-green-700 mt-1">{field.comment}</p>
+                            ) : null;
+                          })}
+                        </div>
+                      ) : null;
+                    }).filter(Boolean)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Necesidades de Acción de Control */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">🛠️ Necesidades de Acción de Control</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                {[
+                  { title: 'Liderazgo y Administración', code: 'S7_C1' },
+                  { title: 'Entrenamiento de Gerencia', code: 'S7_C2' },
+                  { title: 'Inspecciones Planificadas', code: 'S7_C3' },
+                  { title: 'Análisis y Procedimientos', code: 'S7_C4' },
+                  { title: 'Investigación de Accidentes', code: 'S7_C5' },
+                  { title: 'Observación de Tareas', code: 'S7_C6' }
+                ].map(category => {
+                  const field = fieldsMap.get(category.code);
+                  return field?.comment ? (
+                    <div key={category.code} className="bg-indigo-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-indigo-900">{category.title}</h4>
+                      <p className="text-sm text-indigo-700 mt-2">{field.comment}</p>
+                    </div>
+                  ) : null;
+                }).filter(Boolean)}
+              </div>
+            </div>
+
+            {/* Acciones */}
+            <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-medium mb-2 text-primary/70">Acciones</h3>
               <div className="flex flex-col space-y-2">
                 <Button 
