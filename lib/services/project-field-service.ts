@@ -161,7 +161,14 @@ export async function getProjectFieldsByUserAndProjectId(userId: number, project
     console.log(`📋 Obteniendo campos del proyecto ${projectId} para el usuario ${userId} con parent_code: ${parentCode}...`);
     
     let query = `
-      SELECT pf.*, f.name as field_name, f.code as field_code, f.parent_code as field_parent_code, f.has_comment as field_has_comment
+      SELECT pf.*, 
+             f.id as field_id, 
+             f.name as field_name, 
+             f.code as field_code, 
+             f.parent_code as field_parent_code, 
+             f.has_comment as field_has_comment,
+             f.created_at as field_created_at,
+             f.updated_at as field_updated_at
       FROM project_fields pf
       JOIN fields f ON pf.field_id = f.id
       JOIN projects p ON pf.project_id = p.id
@@ -184,5 +191,47 @@ export async function getProjectFieldsByUserAndProjectId(userId: number, project
   } catch (error) {
     console.error(`❌ Error obteniendo campos del proyecto ${projectId} para el usuario ${userId}:`, error);
     throw new Error('Error al obtener los campos del proyecto');
+  }
+}
+
+export async function createMultipleProjectFields(projectId: number, fields: { fieldId: number; comment: string }[]): Promise<ProjectField[]> {
+  try {
+    console.log(`➕ Creando/actualizando ${fields.length} relaciones proyecto-campo para el proyecto ${projectId}...`);
+    
+    const processedFields: ProjectField[] = [];
+    
+    for (const field of fields) {
+      try {
+        // Intentar insertar el campo
+        const insertResult = await db.query(
+          'INSERT INTO project_fields (project_id, field_id, comment) VALUES ($1, $2, $3) RETURNING *',
+          [projectId, field.fieldId, field.comment || null]
+        );
+        processedFields.push(insertResult.rows[0]);
+        console.log(`✅ Campo ${field.fieldId} creado para proyecto ${projectId}`);
+      } catch (insertError: any) {
+        // Si el error es por duplicado, actualizar el campo existente
+        if (insertError.message && insertError.message.includes('unique')) {
+          console.log(`🔄 Campo ${field.fieldId} ya existe, actualizando...`);
+          const updateResult = await db.query(
+            'UPDATE project_fields SET comment = $1 WHERE project_id = $2 AND field_id = $3 RETURNING *',
+            [field.comment || null, projectId, field.fieldId]
+          );
+          if (updateResult.rows.length > 0) {
+            processedFields.push(updateResult.rows[0]);
+            console.log(`✅ Campo ${field.fieldId} actualizado para proyecto ${projectId}`);
+          }
+        } else {
+          // Si es otro tipo de error, re-lanzarlo
+          throw insertError;
+        }
+      }
+    }
+    
+    console.log(`✅ ${processedFields.length} relaciones proyecto-campo procesadas exitosamente`);
+    return processedFields;
+  } catch (error) {
+    console.error(`❌ Error procesando múltiples relaciones proyecto-campo:`, error);
+    throw new Error('Error al procesar las relaciones proyecto-campo');
   }
 }

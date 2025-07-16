@@ -1,11 +1,14 @@
 export interface Project {
   id: number;
-  nombre: string;
-  descripcion: string;
-  fecha: string;
   user_id: number;
   created_at: string;
   updated_at: string;
+  projectFields: (ProjectField & {
+      field_name: string;
+      field_code: string;
+      field_parent_code: string | null;
+      field_has_comment: boolean;
+    })[];
 }
 
 export interface CreateProjectInput {

@@ -53,11 +53,6 @@ export type StepField = {
 };
 
 export type ProjectData = {
-  // Paso 1: Datos del Proyecto
-  name: string;
-  description: string;
-  date: string;
-  
   // Paso 2: Datos del Investigador/Accidentado
   investigator: InvestigatorData;
   accidentVictim: AccidentVictimData;
@@ -98,9 +93,6 @@ export type ProjectData = {
 }
 
 export const projectEmpty: ProjectData = {
-  name: '',
-  description: '',
-  date: '',
   investigator: {
     name: '',
     lastName: '',

@@ -161,14 +161,12 @@ export function ProjectForm() {
     <div className="max-w-5xl mx-auto flex flex-col min-h-screen">
       <div className="sticky top-0 z-10 bg-background border-b">
         <div className="max-w-4xl mx-auto py-6">
-          <div className="flex justify-between items-center">
             <FormNavigation
               step={step}
               prevStep={prevStep}
               nextStep={nextStep}
               showButtons={false}
             />
-          </div>
         </div>
       </div>
       <div className="flex-1 overflow-auto">

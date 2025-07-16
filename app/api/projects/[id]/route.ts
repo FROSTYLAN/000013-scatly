@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProjectByIdAndUserId, updateProjectByUser, deleteProjectByUser } from '@/lib/services/project-service';
+import { getProjectFieldsByUserAndProjectId } from '@/lib/services/project-field-service';
 import { UpdateProjectInput } from '@/types/database-types';
 import { verifyAuth } from '@/lib/auth-utils';
 
@@ -38,10 +39,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
     
     console.log(`✅ Proyecto con ID ${params.id} encontrado`);
+    
+    // Obtener los project_fields asociados al proyecto
+    console.log(`📋 Obteniendo campos del proyecto ${params.id}...`);
+    const projectFields = await getProjectFieldsByUserAndProjectId(auth.userId!, Number(params.id));
+    console.log(`✅ ${projectFields.length} campos obtenidos para el proyecto ${params.id}`);
+    
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      project
+      ...project,
+      projectFields
     });
   } catch (error) {
     console.error(`❌ Error al obtener el proyecto ${params.id}:`, error);

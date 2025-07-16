@@ -132,9 +132,6 @@ export const useProjectForm = () => {
           // Transformar los datos de la API al formato del formulario
           setFormData({
             ...projectEmpty,
-            name: data.project.nombre || '',
-            description: data.project.descripcion || '',
-            date: data.project.fecha || '',
             // Nota: Los datos de persona no existen en la base de datos actual
             // pero mantenemos la estructura del formulario intacta
             investigator: {
@@ -305,13 +302,16 @@ export const useProjectForm = () => {
       // Verificar si estamos en la ruta /new/[id] o /project/[id]
       const isNewRoute = typeof window !== 'undefined' && window.location.pathname.includes('/new/');
       
-      // Preparar los datos para enviar a la API
+      // Preparar los datos para enviar a la API (solo stepFields)
       const projectData = {
-        nombre: formData.name,
-        descripcion: formData.description,
-        fecha: formData.date
-        // Nota: Actualmente la API solo acepta estos campos
-        // En el futuro, se podría extender para incluir más datos
+        // Solo incluir stepFields ya que el proyecto no maneja name, description, date
+        step1Fields: formData.step1Fields || [],
+        step2Fields: formData.step2Fields || [],
+        step3Fields: formData.step3Fields || [],
+        step4Fields: formData.step4Fields || [],
+        step5Fields: formData.step5Fields || [],
+        step6Fields: formData.step6Fields || [],
+        step7Fields: formData.step7Fields || []
       };
       
       // Determinar si es una creación o actualización
@@ -323,10 +323,17 @@ export const useProjectForm = () => {
       
       const method = !isNewRoute && projectId && projectId > 0 ? 'PUT' : 'POST';
       
+      // Obtener token de localStorage
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(projectData),
         credentials: 'include' // Incluir cookies en la solicitud

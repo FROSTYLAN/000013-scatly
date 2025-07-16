@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Project } from '@/types/database-types';
 import { Button } from '@/components/ui/button';
@@ -53,8 +53,8 @@ export function ProjectDetail() {
         
         const data = await response.json();
         
-        if (data.success && data.project) {
-          setProject(data.project);
+        if (data.success) {
+          setProject(data);
         } else {
           setError('No se encontraron datos del proyecto');
         }
@@ -68,6 +68,26 @@ export function ProjectDetail() {
     
     fetchProjectData();
   }, [projectId]);
+
+  // Crear Map de campos para búsquedas eficientes
+  const fieldsMap = useMemo(() => {
+    if (!project?.projectFields) return new Map();
+    return new Map(
+      project.projectFields.map(field => [field.field_code, field])
+    );
+  }, [project?.projectFields]);
+
+  // Obtener campos específicos
+  const fechaField = fieldsMap.get('S1_3');
+  const tituloField = fieldsMap.get('S1_1');
+  const descripcionField = fieldsMap.get('S1_2');
+
+  // Formatear la fecha
+  const formattedDate = fechaField?.comment ? new Date(fechaField.comment).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : 'Fecha no disponible';
 
   // Mostrar estado de carga
   if (loading) {
@@ -125,13 +145,6 @@ export function ProjectDetail() {
     );
   }
 
-  // Formatear la fecha
-  const formattedDate = project.fecha ? new Date(project.fecha).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }) : 'Fecha no disponible';
-
   return (
     <div className="max-w-5xl mx-auto py-8 px-4">
       <div className="mb-6 flex justify-between items-center">
@@ -156,7 +169,7 @@ export function ProjectDetail() {
         <div className="bg-primary/10 p-6">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-primary mb-2">{project.nombre}</h1>
+              <h1 className="text-3xl font-bold text-primary mb-2">{tituloField?.comment}</h1>
               <div className="flex items-center text-sm text-muted-foreground">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -173,7 +186,7 @@ export function ProjectDetail() {
         <div className="p-6">
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-3 text-primary/80">Descripción</h2>
-            <p className="text-muted-foreground whitespace-pre-line">{project.descripcion || 'Sin descripción'}</p>
+            <p className="text-muted-foreground whitespace-pre-line">{descripcionField?.comment || 'Sin descripción'}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -201,7 +214,7 @@ export function ProjectDetail() {
                     // Navegar a la página de edición del proyecto
                     // Añadir el proyecto al store de navegación antes de navegar
                     const newId = addNavItem({
-                      name: project.nombre,
+                      name: tituloField?.comment,
                       id: projectId,
                       isExisting: false // Marcamos como false para que use la ruta /new/
                     });
