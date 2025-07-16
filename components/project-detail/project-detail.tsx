@@ -445,7 +445,7 @@ export function ProjectDetail() {
             {/* Necesidades de Acción de Control */}
             <div className="bg-muted/30 rounded-lg p-4">
               <h2 className="text-lg font-medium mb-2 text-primary/70">🛠️ Necesidades de Acción de Control</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="space-y-4">
                 {[
                   { title: 'Liderazgo y Administración', code: 'S7_C1' },
                   { title: 'Entrenamiento de Gerencia', code: 'S7_C2' },
@@ -454,11 +454,64 @@ export function ProjectDetail() {
                   { title: 'Investigación de Accidentes', code: 'S7_C5' },
                   { title: 'Observación de Tareas', code: 'S7_C6' }
                 ].map(category => {
-                  const field = fieldsMap.get(category.code);
-                  return field?.comment ? (
+                  // Buscar todos los ítems de la categoría (S7_C1_1, S7_C1_2, etc.)
+                  const categoryItems = [];
+                  
+                  // Buscar hasta 20 ítems por categoría
+                  for (let i = 1; i <= 20; i++) {
+                    const itemCode = `${category.code}_${i}`;
+                    
+                    // Para cada ítem, buscar los subcampos P, E, C
+                    const pecFields = [
+                      fieldsMap.get(`${itemCode}_1`), // P
+                      fieldsMap.get(`${itemCode}_2`), // E
+                      fieldsMap.get(`${itemCode}_3`)  // C
+                    ].filter(field => field && field.comment && field.comment.trim() !== '');
+                    
+                    if (pecFields.length > 0) {
+                      categoryItems.push({
+                        itemCode,
+                        fields: pecFields
+                      });
+                    }
+                  }
+                  
+                  return categoryItems.length > 0 ? (
                     <div key={category.code} className="bg-muted/20 border border-indigo-200 p-4 rounded-lg">
-                      <h4 className="font-medium text-foreground">{category.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-2">{field.comment}</p>
+                      <h4 className="font-medium text-foreground mb-3">{category.title}</h4>
+                      <div className="space-y-3">
+                         {categoryItems.map(item => {
+                           // Obtener el nombre del ítem (S7_C1_1, S7_C1_2, etc.)
+                           const itemField = fieldsMap.get(item.itemCode);
+                           const itemName = itemField?.field_name || item.itemCode;
+                           
+                           return (
+                             <div key={item.itemCode} className="space-y-2">
+                               {/* Mostrar el nombre del ítem */}
+                               <div className="font-medium text-sm text-primary border-l-2 border-primary pl-2">
+                                 {itemName}
+                               </div>
+                               {/* Mostrar los subcampos P, E, C */}
+                               <div className="ml-4 space-y-1">
+                                 {item.fields.map((field, index) => {
+                                   const statusLabels = ['P', 'E', 'C'];
+                                   const statusLabel = statusLabels[index];
+                                   
+                                   return (
+                                     <div key={field.field_code} className="text-sm">
+                                       <span className="inline-block w-6 h-6 text-xs font-bold text-white bg-primary rounded-full text-center leading-6 mr-2">
+                                         {statusLabel}
+                                       </span>
+                                       <span className="font-medium">{field.field_name}:</span>
+                                       <span className="ml-2 text-muted-foreground">{field.comment}</span>
+                                     </div>
+                                   );
+                                 })}
+                               </div>
+                             </div>
+                           );
+                         })}
+                      </div>
                     </div>
                   ) : null;
                 }).filter(Boolean)}

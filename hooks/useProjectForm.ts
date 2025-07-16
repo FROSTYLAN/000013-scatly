@@ -254,12 +254,53 @@ export const useProjectForm = () => {
   // Funciones específicas para Step 7 (NAC)
   // Ahora cada campo P, E, C es individual con su propio fieldId
   // Usa la misma estructura que los otros steps: solo fieldId y comment
-  const updateNACField = (fieldId: number, comment: string) => {
+  const updateNACField = async (fieldId: number, comment: string, allFields?: any[]) => {
     updateStepField('step7Fields', fieldId, comment);
+    
+    // Lógica para seleccionar automáticamente el campo padre
+    if (allFields) {
+      // Buscar el campo actual en allFields para obtener su parent_code
+      const currentField = allFields.find(field => field.id === fieldId);
+      if (currentField && currentField.parent_code) {
+        // Buscar el campo padre
+        const parentField = allFields.find(field => field.code === currentField.parent_code);
+        if (parentField && !isNACFieldSelected(parentField.id)) {
+          // Seleccionar el campo padre automáticamente
+          updateStepField('step7Fields', parentField.id, '');
+        }
+      }
+    }
   };
 
-  const removeNACField = (fieldId: number) => {
+  const removeNACField = async (fieldId: number, allFields?: any[]) => {
     removeStepField('step7Fields', fieldId);
+    
+    // Lógica para deseleccionar el campo padre si todos sus hijos P, E, C están deseleccionados
+    if (allFields) {
+      // Buscar el campo actual en allFields para obtener su parent_code
+      const currentField = allFields.find(field => field.id === fieldId);
+      if (currentField && currentField.parent_code) {
+        // Buscar el campo padre
+        const parentField = allFields.find(field => field.code === currentField.parent_code);
+        if (parentField) {
+          // Buscar todos los campos P, E, C hermanos (que tienen el mismo parent_code)
+          const siblingFields = allFields.filter(field => 
+            field.parent_code === currentField.parent_code && 
+            (field.name === 'P' || field.name === 'E' || field.name === 'C')
+          );
+          
+          // Verificar si todos los hermanos están deseleccionados
+          const allSiblingsDeselected = siblingFields.every(sibling => 
+            sibling.id === fieldId || !isNACFieldSelected(sibling.id)
+          );
+          
+          // Si todos los hermanos están deseleccionados, deseleccionar el padre
+          if (allSiblingsDeselected && isNACFieldSelected(parentField.id)) {
+            removeStepField('step7Fields', parentField.id);
+          }
+        }
+      }
+    }
   };
 
   const getNACFieldComment = (fieldId: number): string => {

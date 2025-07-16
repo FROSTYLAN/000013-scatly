@@ -14,9 +14,9 @@ interface FieldData {
 }
 
 interface Step7Props {
-  formData: ProjectData;
-  updateNACField: (fieldId: number, comment: string) => void;
-  removeNACField: (fieldId: number) => void;
+  formData: any;
+  updateNACField: (fieldId: number, comment: string, allFields?: any[]) => Promise<void>;
+  removeNACField: (fieldId: number, allFields?: any[]) => Promise<void>;
   getNACFieldComment: (fieldId: number) => string;
   isNACFieldSelected: (fieldId: number) => boolean;
 }
@@ -188,11 +188,11 @@ export function Step7CorrectiveActions({
                             {/* P Button */}
                             {pecFields.P && (
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   if (isNACFieldSelected(pecFields.P!.id)) {
-                                    removeNACField(pecFields.P!.id);
+                                    await removeNACField(pecFields.P!.id, allFields);
                                   } else {
-                                    updateNACField(pecFields.P!.id, '');
+                                    await updateNACField(pecFields.P!.id, '', allFields);
                                   }
                                 }}
                                 className={`px-3 py-1 rounded transition-colors ${
@@ -207,11 +207,11 @@ export function Step7CorrectiveActions({
                             {/* E Button */}
                             {pecFields.E && (
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   if (isNACFieldSelected(pecFields.E!.id)) {
-                                    removeNACField(pecFields.E!.id);
+                                    await removeNACField(pecFields.E!.id, allFields);
                                   } else {
-                                    updateNACField(pecFields.E!.id, '');
+                                    await updateNACField(pecFields.E!.id, '', allFields);
                                   }
                                 }}
                                 className={`px-3 py-1 rounded transition-colors ${
@@ -226,11 +226,11 @@ export function Step7CorrectiveActions({
                             {/* C Button */}
                             {pecFields.C && (
                               <button
-                                onClick={() => {
+                                onClick={async () => {
                                   if (isNACFieldSelected(pecFields.C!.id)) {
-                                    removeNACField(pecFields.C!.id);
+                                    await removeNACField(pecFields.C!.id, allFields);
                                   } else {
-                                    updateNACField(pecFields.C!.id, '');
+                                    await updateNACField(pecFields.C!.id, '', allFields);
                                   }
                                 }}
                                 className={`px-3 py-1 rounded transition-colors ${
@@ -253,7 +253,7 @@ export function Step7CorrectiveActions({
                               placeholder="Agregar un comentario..."
                               value={getNACFieldComment(pecFields.P.id)}
                               onChange={(e) => {
-                                updateNACField(pecFields.P!.id, e.target.value);
+                                updateNACField(pecFields.P!.id, e.target.value, allFields);
                               }}
                               className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                               rows={2}
@@ -268,7 +268,7 @@ export function Step7CorrectiveActions({
                               placeholder="Agregar un comentario..."
                               value={getNACFieldComment(pecFields.E.id)}
                               onChange={(e) => {
-                                updateNACField(pecFields.E!.id, e.target.value);
+                                updateNACField(pecFields.E!.id, e.target.value, allFields);
                               }}
                               className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                               rows={2}
@@ -283,7 +283,7 @@ export function Step7CorrectiveActions({
                               placeholder="Agregar un comentario..."
                               value={getNACFieldComment(pecFields.C.id)}
                               onChange={(e) => {
-                                updateNACField(pecFields.C!.id, e.target.value);
+                                updateNACField(pecFields.C!.id, e.target.value, allFields);
                               }}
                               className="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-amber-100/10 text-white placeholder:text-gray-400"
                               rows={2}
