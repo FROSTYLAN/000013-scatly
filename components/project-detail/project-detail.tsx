@@ -471,27 +471,6 @@ export function ProjectDetail() {
               <div className="flex flex-col space-y-2">
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    // Navegar a la página de edición del proyecto
-                    // Añadir el proyecto al store de navegación antes de navegar
-                    const newId = addNavItem({
-                      name: tituloField?.comment,
-                      id: projectId,
-                      isExisting: false // Marcamos como false para que use la ruta /new/
-                    });
-                    // Actualizar manualmente la ruta activa
-                    setActivePath(`/new/${projectId}`);
-                    router.push(`/new/${projectId}`);
-                  }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  Editar Proyecto
-                </Button>
-                <Button
-                  variant="outline"
                   className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-500/10"
                   onClick={() => setShowDeleteModal(true)}
                 >
