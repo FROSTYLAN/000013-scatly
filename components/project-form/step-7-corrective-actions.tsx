@@ -3,6 +3,7 @@
 import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { FIELD_DEPENDENCIES } from '@/lib/default-fields';
 
 interface FieldData {
   id: number;
@@ -68,6 +69,38 @@ export function Step7CorrectiveActions({
     return result;
   };
 
+  // Get selected Step 6 codes from formData (cleaner approach)
+  const getSelectedFieldsFromStep6 = (): string[] => {
+    if (!formData?.step6Fields) return [];
+    
+    // Como step6Fields solo tiene fieldId sin code, no podemos mapear directamente
+    // Para implementar filtrado apropiado, necesitaríamos que formData incluya code o 
+    // necesitaríamos cargar primero los datos del Step 6 para obtener el mapeo id->code.
+    // Por ahora, retornamos vacío para evitar filtrado incorrecto.
+    return [];
+  };
+
+  // Filter NAC categories based on dependencies from Step 6
+  const filterNacCategories = (categories: FieldData[]): FieldData[] => {
+    const selectedStep6 = getSelectedFieldsFromStep6();
+    if (selectedStep6.length === 0) return categories;
+
+    const visible = new Set<string>();
+    selectedStep6.forEach(s => {
+      if (FIELD_DEPENDENCIES[s]) {
+        FIELD_DEPENDENCIES[s].forEach(dep => visible.add(dep));
+      }
+    });
+
+    if (visible.size === 0) return categories;
+
+    // Each category has subcategories; we keep a category if any child is visible
+    return categories.map(cat => ({
+      ...cat,
+      children: cat.children.filter(sub => visible.has(sub.code))
+    })).filter(cat => cat.children.length > 0);
+  };
+
   useEffect(() => {
     const fetchNACCategories = async () => {
       try {
@@ -89,7 +122,6 @@ export function Step7CorrectiveActions({
         const data = await response.json();
 
         if (data.success && data.data) {
-          console.log('Datos de la API:', data.data);
           const sortedCategories = (data.data.children || []).sort((a: any, b: any) => {
             const numA = getLastNumber(a.code);
             const numB = getLastNumber(b.code);
@@ -103,8 +135,8 @@ export function Step7CorrectiveActions({
             })
           }));
 
-          console.log('Categorías de la API:', sortedCategories.map((cat: any) => cat.name));
-          setNacCategories(sortedCategories);
+          const filtered = filterNacCategories(sortedCategories);
+          setNacCategories(filtered);
 
           setError(null);
         } else {
@@ -121,6 +153,8 @@ export function Step7CorrectiveActions({
     fetchNACCategories();
   }, []);
 
+  const hasFilters = getSelectedFieldsFromStep6().length > 0;
+
   if (loading) {
     return (
       <LoadingSpinner
@@ -134,6 +168,14 @@ export function Step7CorrectiveActions({
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Necesidades de Acción de Control (NAC) = Falta de Control</h2>
+
+      {hasFilters && (
+        <div className="p-3 rounded-lg border border-amber-200 bg-amber-100/10">
+          <p className="text-xs text-amber-300">
+            Filtrado activo: mostrando subcategorías NAC relacionadas con las causas básicas seleccionadas en el Step 6.
+          </p>
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (

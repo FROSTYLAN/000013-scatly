@@ -931,6 +931,69 @@ export const DEFAULT_FIELDS = [
       { parent_code: 'S7_C20_2', code: 'S7_C20_2_3', name: 'C', has_comment: false },
 ];
 
+// Configuración de dependencias entre campos de diferentes steps
+export const FIELD_DEPENDENCIES: Record<string, string[]> = {
+  // Ejemplo: Si se selecciona S3_1_1 (Mayor - A), mostrar estos campos en STEP_4
+  'S3_1_1': ['S4_1', 'S4_2', 'S4_3'],
+  // Si se selecciona S3_1_2 (Grave - B), mostrar otros campos en STEP_4
+  'S3_1_2': ['S4_4', 'S4_5', 'S4_6'],
+  // Si se selecciona S3_1_3 (Menor - C), mostrar otros campos en STEP_4
+  'S3_1_3': ['S4_7', 'S4_8', 'S4_9'],
+  
+  // Si se selecciona S3_2_1 (Alta probabilidad), mostrar adicionales en STEP_4
+  'S3_2_1': ['S4_8', 'S4_9'],
+  
+  // Para STEP_4 -> STEP_5: según tipo de contacto, mostrar causas específicas
+  'S4_1': ['S5_C1_1', 'S5_C1_2', 'S5_C1_3'], // Golpeada Contra
+  'S4_2': ['S5_C1_4', 'S5_C1_5', 'S5_C1_6'], // Golpeado por
+  'S4_3': ['S5_C1_7', 'S5_C1_8', 'S5_C1_9'], // Caída a nivel más bajo
+  'S4_4': ['S5_C1_10', 'S5_C1_11'], // Caída mismo nivel
+  'S4_5': ['S5_C1_12', 'S5_C1_13'], // Atrapado
+  'S4_6': ['S5_C1_14', 'S5_C1_15'], // Cogido
+  'S4_7': ['S5_C1_16'], // Atrapado entre
+  'S4_8': ['S5_C2_1', 'S5_C2_2', 'S5_C2_3'], // Contacto con energía
+  'S4_9': ['S5_C2_4', 'S5_C2_5'], // Sobretensión
+  
+  // Para STEP_5 -> STEP_6: según causas inmediatas, mostrar causas básicas
+  'S5_C1_1': ['S6_1', 'S6_2'], // Operar sin autorización
+  'S5_C1_2': ['S6_3', 'S6_4'], // Omisión de advertir
+  'S5_C1_3': ['S6_5', 'S6_6'], // Omisión de asegurar
+  'S5_C1_4': ['S6_7', 'S6_8'], // Velocidad indebida
+  'S5_C1_5': ['S6_9', 'S6_10'], // Desactivar dispositivos
+  'S5_C1_6': ['S6_11', 'S6_12'], // Usar equipo defectuoso
+  'S5_C1_7': ['S6_13', 'S6_14'], // No usar EPP
+  'S5_C1_8': ['S6_15', 'S6_16'], // Carga incorrecta
+  'S5_C1_9': ['S6_17', 'S6_18'], // Colocación incorrecta
+  'S5_C1_10': ['S6_19', 'S6_20'], // Levantar incorrectamente
+  
+  // Condiciones subestándar también influyen en causas básicas
+  'S5_C2_1': ['S6_21', 'S6_22'], // Guardas inadecuadas
+  'S5_C2_2': ['S6_23', 'S6_24'], // Estructuras inestables
+  'S5_C2_3': ['S6_25', 'S6_26'], // Superficies inadecuadas
+  'S5_C2_4': ['S6_27', 'S6_28'], // EPP incorrecto
+  'S5_C2_5': ['S6_29', 'S6_30'], // Herramientas defectuosas
+  
+  // Para STEP_6 -> STEP_7: según causas básicas, mostrar acciones correctivas específicas
+  'S6_1': ['S7_C1_1', 'S7_C1_2'], // Liderazgo
+  'S6_2': ['S7_C2_1', 'S7_C2_2'], // Entrenamiento
+  'S6_3': ['S7_C3_1', 'S7_C3_2'], // Inspecciones
+  'S6_4': ['S7_C4_1', 'S7_C4_2'], // Análisis de tareas
+  'S6_5': ['S7_C5_1', 'S7_C5_2'], // Investigación
+  'S6_6': ['S7_C6_1', 'S7_C6_2'], // Observación
+  'S6_7': ['S7_C7_1', 'S7_C7_2'], // Preparación emergencias
+  'S6_8': ['S7_C8_1', 'S7_C8_2'], // Reglas
+  'S6_9': ['S7_C9_1', 'S7_C9_2'], // Mantenimiento
+  'S6_10': ['S7_C10_1', 'S7_C10_2'], // EPP
+  
+  // Más dependencias específicas según la lógica del negocio
+  'S6_11': ['S7_C11_1', 'S7_C11_2'], // Controles de ingeniería
+  'S6_12': ['S7_C12_1', 'S7_C12_2'], // Comunicaciones
+  'S6_13': ['S7_C13_1', 'S7_C13_2'], // Reuniones grupales
+  'S6_14': ['S7_C14_1', 'S7_C14_2'], // Promoción general
+  'S6_15': ['S7_C15_1', 'S7_C15_2'], // Contratación
+  'S6_16': ['S7_C16_1', 'S7_C16_2'], // Controles de compra
+};
+
 // Función para obtener campos raíz (sin parent)
 export function getRootFields() {
   return DEFAULT_FIELDS.filter(field => field.parent_code === null);
@@ -959,4 +1022,77 @@ export function getFieldsWithoutComments() {
 // Función para obtener un campo por código
 export function getFieldByCode(code: string) {
   return DEFAULT_FIELDS.find(field => field.code === code);
+}
+
+/**
+ * Filtra los campos visibles de un step basado en las selecciones de steps anteriores
+ * @param stepCode - Código del step actual (ej: 'STEP_4', 'STEP_5', etc.)
+ * @param selectedFields - Array de códigos de campos seleccionados en steps anteriores
+ * @returns Array de campos filtrados que deben mostrarse
+ */
+export function getVisibleFields(stepCode: string, selectedFields: string[] = []) {
+  // Obtener todos los campos del step actual
+  const allStepFields = getChildFields(stepCode);
+  
+  // Si no hay selecciones previas, mostrar todos los campos
+  if (selectedFields.length === 0) {
+    return allStepFields;
+  }
+  
+  // Obtener campos que deben mostrarse basado en dependencias
+  const visibleFieldCodes = new Set<string>();
+  
+  // Para cada campo seleccionado, agregar sus dependencias
+  selectedFields.forEach(selectedField => {
+    if (FIELD_DEPENDENCIES[selectedField]) {
+      FIELD_DEPENDENCIES[selectedField].forEach(dependentField => {
+        visibleFieldCodes.add(dependentField);
+      });
+    }
+  });
+  
+  // Si no hay dependencias específicas, mostrar todos los campos
+  if (visibleFieldCodes.size === 0) {
+    return allStepFields;
+  }
+  
+  // Filtrar campos que están en las dependencias
+  return allStepFields.filter(field => visibleFieldCodes.has(field.code));
+}
+
+/**
+ * Obtiene las selecciones activas de un step específico del formData
+ * @param formData - Datos del formulario actual
+ * @param stepCode - Código del step (ej: 'STEP_3')
+ * @returns Array de códigos de campos seleccionados
+ */
+export function getStepSelections(formData: any, stepCode: string): string[] {
+  if (!formData) return [];
+
+  // Determinar arreglo de fields basado en stepCode
+  const stepKeyMap: Record<string, keyof typeof formData> = {
+    'STEP_1': 'step1Fields',
+    'STEP_2_A': 'step2Fields',
+    'STEP_2_B': 'step2Fields',
+    'STEP_3': 'step3Fields',
+    'STEP_4': 'step4Fields',
+    'STEP_5': 'step5Fields',
+    'STEP_6': 'step6Fields',
+    'STEP_7': 'step7Fields',
+  } as any;
+
+  const stepKey = stepKeyMap[stepCode];
+  const stepArray = formData?.[stepKey] || [];
+
+  // Mapeamos fieldId a code usando DEFAULT_FIELDS si está disponible en cliente
+  const idToCode = new Map<number, string>();
+  DEFAULT_FIELDS.forEach(f => {
+    // Nota: en el cliente no tenemos id para DEFAULT_FIELDS, pero la API provee ids.
+    // Esta función es más útil cuando los componentes ya conocen el code al filtrar
+  });
+
+  // En este proyecto, los componentes guardan solo fieldId; para derivar code necesitamos la lista actual de fields del step
+  // Recomendado: pasar selected codes desde cada step componente cuando llame a getVisibleFields
+
+  return stepArray.map((f: any) => f.code).filter(Boolean);
 }

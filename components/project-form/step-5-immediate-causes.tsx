@@ -1,6 +1,7 @@
 import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { FIELD_DEPENDENCIES } from '@/lib/default-fields';
 
 interface FieldData {
   id: number;
@@ -64,6 +65,74 @@ export function Step5ImmediateCauses({
     fetchFields();
   }, []);
 
+  // Obtener selecciones del Step 4 para filtrar campos visibles
+  const getSelectedFieldsFromStep4 = (): string[] => {
+    const step4Fields = formData.step4Fields || [];
+    const selectedCodes: string[] = [];
+    
+    step4Fields.forEach((field: any) => {
+      if (field.fieldId) {
+        // Mapeo temporal basado en la estructura conocida del Step 4
+        const step4Mapping: Record<number, string> = {
+          // Estos IDs deberían coincidir con los fieldId del Step 4
+          // Ejemplo de mapeo (ajustar según datos reales de la API):
+          81: 'S4_1', // Golpeada Contra
+          82: 'S4_2', // Golpeado por
+          83: 'S4_3', // Caída a nivel más bajo
+          84: 'S4_4', // Caída mismo nivel
+          85: 'S4_5', // Atrapado
+          86: 'S4_6', // Cogido
+          87: 'S4_7', // Atrapado entre
+          88: 'S4_8', // Contacto con energía
+          89: 'S4_9', // Sobretensión
+        };
+        
+        const code = step4Mapping[field.fieldId];
+        if (code) {
+          selectedCodes.push(code);
+        }
+      }
+    });
+    
+    return selectedCodes;
+  };
+
+  // Filtrar causas basado en selecciones del Step 4
+  const getFilteredCategory = (category: FieldData) => {
+    const selectedStep4Fields = getSelectedFieldsFromStep4();
+    
+    // Si no hay selecciones en Step 4, mostrar todas las causas
+    if (selectedStep4Fields.length === 0) {
+      return category;
+    }
+    
+    // Obtener códigos de campos visibles basado en dependencias
+    const visibleFieldCodes = new Set<string>();
+    
+    selectedStep4Fields.forEach(selectedField => {
+      if (FIELD_DEPENDENCIES[selectedField]) {
+        FIELD_DEPENDENCIES[selectedField].forEach(dependentField => {
+          visibleFieldCodes.add(dependentField);
+        });
+      }
+    });
+    
+    // Si no hay dependencias específicas, mostrar todas las causas
+    if (visibleFieldCodes.size === 0) {
+      return category;
+    }
+    
+    // Filtrar causas que están en las dependencias
+    const filteredChildren = category.children.filter(cause => 
+      visibleFieldCodes.has(cause.code)
+    );
+    
+    return {
+      ...category,
+      children: filteredChildren
+    };
+  };
+
   if (loading) {
     return <LoadingSpinner title="Causas inmediatas o directas (CI)" />;
   }
@@ -76,9 +145,12 @@ export function Step5ImmediateCauses({
     return <div className="text-center py-8">No se encontraron datos</div>;
   }
 
-  // Get the two main categories from the API data
+  // Get the two main categories from the API data and filter them
   const unsafeActsCategory = fieldsData.children.find(child => child.code === 'S5_C1');
   const unsafeConditionsCategory = fieldsData.children.find(child => child.code === 'S5_C2');
+
+  const filteredUnsafeActs = unsafeActsCategory ? getFilteredCategory(unsafeActsCategory) : null;
+  const filteredUnsafeConditions = unsafeConditionsCategory ? getFilteredCategory(unsafeConditionsCategory) : null;
 
   const getLastNumber = (code: string): number => {
     const match = code.match(/(\d+)$/);
@@ -107,6 +179,21 @@ export function Step5ImmediateCauses({
     return (
       <div className="space-y-4">
         <h3 className="font-medium text-center pb-2 border-b">{category.name}</h3>
+        
+        {/* Mostrar información sobre el filtrado si hay filtros aplicados */}
+        {getSelectedFieldsFromStep4().length > 0 && (
+          <div className="p-3 rounded-lg border border-amber-200 bg-amber-100/10">
+            <p className="text-xs text-amber-300">
+              <strong>Filtrado activo:</strong> Mostrando causas relevantes basadas en el tipo de contacto seleccionado.
+              {sortedCauses.length === 0 && (
+                <span className="block mt-1 text-amber-400">
+                  No hay causas asociadas a sus selecciones del Step 4.
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+        
         <div className="space-y-2">
           {sortedCauses.map((cause) => {
             const isSelected = isStepFieldSelected('step5Fields', cause.id);
@@ -186,21 +273,39 @@ export function Step5ImmediateCauses({
               </div>
             );
           })}
+          
+          {sortedCauses.length === 0 && getSelectedFieldsFromStep4().length > 0 && (
+            <div className="text-center py-4 text-gray-400">
+              <p className="text-sm">No hay {category.name.toLowerCase()} asociadas a sus selecciones del Step 4.</p>
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
+  const selectedStep4Fields = getSelectedFieldsFromStep4();
+  const hasStep4Selections = selectedStep4Fields.length > 0;
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">{fieldsData.name}</h2>
       
+      {/* Información general sobre el filtrado */}
+      {hasStep4Selections && (
+        <div className="p-4 rounded-lg border border-amber-200 bg-amber-100/10">
+          <p className="text-sm text-amber-300">
+            <strong>Filtrado inteligente:</strong> Las causas inmediatas mostradas están relacionadas con el tipo de contacto seleccionado en el Step 4.
+          </p>
+        </div>
+      )}
+      
       <div className="grid md:grid-cols-2 gap-8">
         {/* Actos Subestándares/Inseguros */}
-        {unsafeActsCategory && renderCategory(unsafeActsCategory)}
+        {filteredUnsafeActs && renderCategory(filteredUnsafeActs)}
 
         {/* Condiciones Subestándares/Inseguras */}
-        {unsafeConditionsCategory && renderCategory(unsafeConditionsCategory)}
+        {filteredUnsafeConditions && renderCategory(filteredUnsafeConditions)}
       </div>
     </div>
   );

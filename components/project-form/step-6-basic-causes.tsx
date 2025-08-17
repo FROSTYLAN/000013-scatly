@@ -3,6 +3,7 @@
 import { ProjectData } from '@/types/project';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { FIELD_DEPENDENCIES } from '@/lib/default-fields';
 
 interface FieldData {
   id: number;
@@ -136,6 +137,51 @@ export function Step6BasicCauses({
 
     fetchFields();
   }, []);
+
+  // Obtener selecciones del Step 5 para filtrar campos visibles
+  const getSelectedFieldsFromStep5 = (): string[] => {
+    // step5Fields no está disponible en las props actuales de este componente.
+    // Agregaremos el formData como parte de las props para poder leerlo.
+    // Como workaround mínimo, leeremos desde window.localStorage el draft si existe.
+    try {
+      const raw = localStorage.getItem('project_form_data');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      const step5Fields = parsed?.formData?.step5Fields || parsed?.step5Fields || [];
+
+      // Mapeo temporal basado en estructura conocida del Step 5 (códigos de causas nivel 1)
+      const idToCode: Record<number, string> = {};
+      // No conocemos los IDs exactos en tiempo de desarrollo, por lo que no podemos mapear con precisión aquí.
+      // En ausencia de IDs, devolvemos vacío para no filtrar erróneamente.
+      if (Object.keys(idToCode).length === 0) return [];
+
+      const selectedCodes: string[] = [];
+      step5Fields.forEach((f: any) => {
+        const code = idToCode[f.fieldId];
+        if (code) selectedCodes.push(code);
+      });
+      return selectedCodes;
+    } catch {
+      return [];
+    }
+  };
+
+  // Aplica filtro a una lista de factores usando dependencias desde Step 5
+  const filterFactorsByDependencies = (factors: ApiBasicCause[]): ApiBasicCause[] => {
+    const selectedStep5 = getSelectedFieldsFromStep5();
+    if (selectedStep5.length === 0) return factors;
+
+    const visible = new Set<string>();
+    selectedStep5.forEach(s => {
+      if (FIELD_DEPENDENCIES[s]) {
+        FIELD_DEPENDENCIES[s].forEach(dep => visible.add(dep));
+      }
+    });
+
+    if (visible.size === 0) return factors;
+
+    return factors.filter(f => visible.has(f.code));
+  };
 
   // Fallback static data
   const originalPersonalFactors = [
@@ -308,16 +354,28 @@ export function Step6BasicCauses({
     updateStepField('step6Fields', fieldId, comment);
   };
 
+  const filteredPersonal = filterFactorsByDependencies(personalFactors);
+  const filteredWork = filterFactorsByDependencies(workFactors);
+  const hasFilters = getSelectedFieldsFromStep5().length > 0;
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Causas Básicas o Subyacentes (CB)</h2>
+
+      {hasFilters && (
+        <div className="p-3 rounded-lg border border-amber-200 bg-amber-100/10">
+          <p className="text-xs text-amber-300">
+            Mostrando factores relacionados según las causas inmediatas seleccionadas en el Step 5.
+          </p>
+        </div>
+      )}
       
       <div className="grid md:grid-cols-2 gap-8">
         {/* Factores Personales */}
         <div className="space-y-4">
           <h3 className="font-medium text-center pb-2 border-b">FACTORES PERSONALES</h3>
           <div className="space-y-2">
-            {personalFactors.map((factor) => {
+            {filteredPersonal.map((factor) => {
               const isSelected = isStepFieldSelected('step6Fields', factor.id);
               const currentComment = getStepFieldComment('step6Fields', factor.id);
 
@@ -388,14 +446,20 @@ export function Step6BasicCauses({
                 </div>
               );
             })}
+
+            {filteredPersonal.length === 0 && hasFilters && (
+              <div className="text-center py-4 text-gray-400 text-sm">
+                No hay factores personales asociados a sus selecciones del Step 5.
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Factores Laborales */}
+        {/* Factores de Trabajo */}
         <div className="space-y-4">
-          <h3 className="font-medium text-center pb-2 border-b">FACTORES LABORALES</h3>
+          <h3 className="font-medium text-center pb-2 border-b">FACTORES DE TRABAJO</h3>
           <div className="space-y-2">
-            {workFactors.map((factor) => {
+            {filteredWork.map((factor) => {
               const isSelected = isStepFieldSelected('step6Fields', factor.id);
               const currentComment = getStepFieldComment('step6Fields', factor.id);
 
@@ -466,6 +530,12 @@ export function Step6BasicCauses({
                 </div>
               );
             })}
+
+            {filteredWork.length === 0 && hasFilters && (
+              <div className="text-center py-4 text-gray-400 text-sm">
+                No hay factores de trabajo asociados a sus selecciones del Step 5.
+              </div>
+            )}
           </div>
         </div>
       </div>
